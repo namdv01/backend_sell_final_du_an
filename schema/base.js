@@ -79,6 +79,19 @@ const baseSchema = {
   },
   id: {
     type: 'string',
+  },
+  statusOrder: {
+    type: 'string',
+    enum: ['watting', 'cancel', 'delivering', 'done']
+  },
+  payment: {
+    type: 'boolean',
+  },
+  address: {
+    type: 'string'
+  },
+  logo: {
+    type: 'string',
   }
 };
 

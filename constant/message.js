@@ -42,6 +42,11 @@ const MESSAGE = {
   SEARCH_PRODUCT_SUCCESS: 'tìm kiếm sản phẩm thành công',
   QUANTITY_NOK: 'số lượng không hợp lệ',
   IMAGE_ARRAY: 'mảng ảnh không hợp lệ',
+  STATUS_ORDER_NOK: 'trạng thái đơn hàng không hợp lệ',
+  PAYMENT_NOK: 'trạng thái thanh toán không hợp lệ',
+  NAME_SHOP_REQUIRED: 'thiếu tên gian hàng',
+  ADDRESS_SHOP_REQUIRED: 'thiếu địa chỉ gian hàng',
+  LOGO_SHOP_REQUIRED: 'thiếu logo gian hàng',
 }
 
 module.exports = MESSAGE;
