@@ -19,7 +19,7 @@ fastify.get('/abcd', (request, reply) => {
 })
 fastify.register(require('./app'));
 
-fastify.listen({ port: 3000, host: '0.0.0.0' }, (err, address) => {
+fastify.listen({ port: 3666, host: '0.0.0.0' }, (err, address) => {
   if (err) throw err
   // Server is now listening on ${address}
 }) 
