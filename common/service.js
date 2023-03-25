@@ -51,7 +51,7 @@ const CommonService = {
 
   },
 
-  async login(body, { jwt }) {
+  async login(body, { jwt, host }) {
     const { email, password } = body;
     const query = pg.from('user');
     const user = await query.clone().where({ email }).first();
@@ -72,6 +72,7 @@ const CommonService = {
       payload: {
         user,
         token,
+        host
       }
     }
   },
