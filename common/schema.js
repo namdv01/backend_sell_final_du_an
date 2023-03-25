@@ -3,7 +3,7 @@ const MESSAGE = require("../constant/message");
 
 const register = {
   body: {
-    required: ['email', 'password', 'fullname', 'gender', 'phone', 'avatar'],
+    required: ['email', 'password', 'fullname', 'gender', 'phone', 'avatar', 'role'],
     type: 'object',
     additionalProperties: false,
     // avatar not required salt in crypto
@@ -43,6 +43,12 @@ const register = {
         errorMessage: {
           _: MESSAGE.PHONE_INVALID
         }
+      },
+      role: {
+        ...baseSchema.role,
+        errorMessage: {
+          _: MESSAGE.ROLE_INVALID
+        }
       }
     },
     errorMessage: {
@@ -52,6 +58,7 @@ const register = {
         fullname: MESSAGE.FULLNAME_REQUIRED,
         gender: MESSAGE.GENDER_REQUIRED,
         phone: MESSAGE.PHONE_REQUIRED,
+        role: MESSAGE.ROLE_REQUIRED,
       }
     }
   },

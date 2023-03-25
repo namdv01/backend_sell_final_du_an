@@ -1,3 +1,6 @@
+const { v4 } = require('uuid');
+const fs = require('fs');
+
 const typeFile = [
   'jpeg',
   'png',
@@ -26,6 +29,23 @@ const image = {
     const file = str.split(';base64')[0];
     const origin = file.split('/')[1];
     if (origin) return typeFile.includes(origin.toLowerCase());
+    return false;
+  },
+
+  convertImage: (binaryUrl, folder) => {
+    const buff = Buffer.from(binaryUrl.split('base64,')[1], 'base64');
+    const filename = `${v4() + Date.now()}.jpg`;
+    const foldername = `${folder}/${filename}`;
+    fs.writeFileSync(`./public/img/${foldername}`, buff);
+    return foldername;
+  },
+
+  deleteImage: (path) => {
+    const fullPath = `./public/img/${path}`;
+    if (fs.existsSync(fullPath)) {
+      fs.unlinkSync(fullPath);
+      return true;
+    }
     return false;
   },
 }

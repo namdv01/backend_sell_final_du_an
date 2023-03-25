@@ -3,13 +3,13 @@ const passwordService = require('../base/password');
 const imageService = require('../base/image');
 const MESSAGE = require('../constant/message');
 const cloudinary = require('../base/cloudinary');
-const { checkLogin, changePassword } = require('./schema');
+const { checkLogin } = require('./schema');
 const { connectPg: pg } = require('../base/connectDb');
 const { PAGINATION } = require('../constant');
 
 const CommonService = {
   async register(body) {
-    const { email, password, gender, fullname, avatar, phone } = body;
+    const { email, password, gender, fullname, avatar, phone, role } = body;
     const query = pg.from('user');
     const existUsername = await query.clone().where({ email }).first();
 
@@ -17,14 +17,19 @@ const CommonService = {
       throw new Error(MESSAGE.EMAIL_BE_USED);
     }
 
+
     if (!imageService.checkType(avatar) || imageService.sizeBase64(avatar) > 5) {
       throw new Error(MESSAGE.AVATAR_INVALID);
     }
-    const save_avatar = await cloudinary.uploader.upload(avatar, {
-      folder: '/sale_final/avatar'
-    });
+
+    // const save_avatar = await cloudinary.uploader.upload(avatar, {
+    //   folder: '/sale_final/avatar'
+    // });
+
+    const publicAvatar = imageService.convertImage(avatar, 'avatar');
 
     const id = v4();
+    console.log(id);
     const dataSave = {
       email,
       password: passwordService.hash(password),
@@ -32,8 +37,9 @@ const CommonService = {
       fullname,
       phone,
       id,
-      role: 'admin',
-      avatar: save_avatar.secure_url
+      role,
+      avatar: publicAvatar,
+      // avatar: save_avatar.secure_url
     };
 
     await query.insert(dataSave);

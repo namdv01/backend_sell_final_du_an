@@ -13,6 +13,8 @@ const MESSAGE = {
   PHONE_INVALID: 'Số điện thoại không hợp lệ',
   PHONE_REQUIRED: 'Thiếu số điện thoại',
   AVATAR_INVALID: 'Ảnh đại diện không hợp lệ',
+  ROLE_INVALID: 'Vai trò không hợp lệ',
+  ROLE_REQUIRED: 'Thiếu vai trò',
   IS_NOT_AUTH: 'Chưa được xác thực',
   IS_NOT_AUTH_ADMIN: 'Không phải quản trị viên',
   IS_NOT_AUTH_SELLER: 'Không phải người bán',

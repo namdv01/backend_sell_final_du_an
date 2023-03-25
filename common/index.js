@@ -7,8 +7,10 @@ async function registerHandler(req, rep) {
 };
 
 async function loginHandler(req, rep) {
+  console.log(req.headers.host);
   const response = await CommonService.login(req.body, {
-    jwt: this.jwt
+    jwt: this.jwt,
+    host: req.headers.host,
   });
   return rep.send(response);
 };
