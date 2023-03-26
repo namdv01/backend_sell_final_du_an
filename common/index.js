@@ -7,7 +7,6 @@ async function registerHandler(req, rep) {
 };
 
 async function loginHandler(req, rep) {
-  console.log(req.headers.host);
   const response = await CommonService.login(req.body, {
     jwt: this.jwt,
     host: req.headers.host,
@@ -22,7 +21,8 @@ async function checkLoginHandler(req, rep) {
 };
 
 async function changeProfileHandler(req, rep) {
-  const response = await CommonService.changeProfile(req.body, req.user.id);
+  const { host } = req.headers;
+  const response = await CommonService.changeProfile(req.body, req.user.id, host);
   return rep.send(response);
 };
 

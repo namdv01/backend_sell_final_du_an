@@ -24,6 +24,8 @@ const MESSAGE = {
   REGISTER_SUCCESS: 'Đăng ký thành công',
   LOGOUT_SUCCESS: 'Đăng xuất thành công',
   LOGIN_SUCCESS: 'Đăng nhập thành công',
+  CREATE_SHOP_SUCCESS: 'Tạo gian hàng thành công',
+  CREATE_PRODUCT_SUCCESS: 'Tạo thêm sản phẩm thành công',
   CHANGE_PASSWORD_SUCCESS: 'Đổi mật khẩu thành công',
   EMAIL_RESET_PASSWORD_BE_SEND: 'Email yêu cầu đổi mật khẩu được gửi',
   SUBJECT_FORGET_PASSWORD: 'THAY ĐỔI MẬT KHẨU',
@@ -49,6 +51,8 @@ const MESSAGE = {
   NAME_SHOP_REQUIRED: 'thiếu tên gian hàng',
   ADDRESS_SHOP_REQUIRED: 'thiếu địa chỉ gian hàng',
   LOGO_SHOP_REQUIRED: 'thiếu logo gian hàng',
+  NOT_OWN_SHOP: 'Gian hàng không thuộc quản lý',
+  IMAGE_INVALID: 'Ảnh không hợp lệ',
 }
 
 module.exports = MESSAGE;

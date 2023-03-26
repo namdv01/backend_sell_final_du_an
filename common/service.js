@@ -62,6 +62,7 @@ const CommonService = {
       throw new Error(MESSAGE.INFORMATION_INVALID);
     }
     delete user.password;
+    user.avatar = `${host}/public/img/${user.avatar}`;
     const token = jwt.sign({
       id: user.id,
       role: user.role,
@@ -82,7 +83,6 @@ const CommonService = {
     if (!user) {
       throw new Error(MESSAGE.IS_NOT_AUTH);
     }
-    console.log(user);
     return {
       code: 0,
       message: 'ok',
@@ -90,7 +90,7 @@ const CommonService = {
     }
   },
 
-  async changeProfile({ fullname, avatar, phone, gender }, id) {
+  async changeProfile({ fullname, avatar, phone, gender }, id, host) {
     const query = pg('user').where({ id });
     const user = await query.clone().first();
     if (!user) {
@@ -104,13 +104,16 @@ const CommonService = {
       throw new Error(MESSAGE.AVATAR_INVALID);
     }
     if (avatar) {
-      const save_avatar = await cloudinary.uploader.upload(avatar, {
-        folder: '/sale_final/avatar'
-      });
-      const public_id = user.avatar.split('/').splice(-1)[0].slice(0, 4);
-      formUpdate.avatar = save_avatar;
+      // const save_avatar = await cloudinary.uploader.upload(avatar, {
+      //   folder: '/sale_final/avatar'
+      // });
+      // const public_id = user.avatar.split('/').splice(-1)[0].slice(0, 4);
+      const publicAvatar = imageService.convertImage(avatar, 'avatar');
+      formUpdate.avatar = publicAvatar;
       await query.update(formUpdate);
-      await cloudinary.uploader.destroy(public_id);
+      imageService.deleteImage(user.avatar);
+      // await cloudinary.uploader.destroy(public_id);
+      formUpdate.avatar = `${host}/public/img/${formUpdate.avatar}`;
       return {
         code: 0,
         message: MESSAGE.UPDATE_PROFILE_SUCCESS,

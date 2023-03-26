@@ -5,12 +5,22 @@ const { createProduct, editProduct, delProduct, getProduct, getListProduct,
 const SellerService = require('./service');
 
 async function createProductHandler(req, rep) {
-  const response = await SellerService.createProduct(req.body, req.user.id);
+  const body = {
+    ...req.body,
+    id_user: req.user.id,
+    host: req.headers.host,
+  }
+  const response = await SellerService.createProduct(body);
   return rep.send(response);
 };
 
 async function editProductHandler(req, rep) {
-  const response = await SellerService.editProduct(req.body, req.user.id, req.params.id);
+  const body = {
+    id_product: req.params.id,
+    id_user: req.user.id,
+    ...req.body,
+  }
+  const response = await SellerService.editProduct(body);
   return rep.send(response);
 };
 
@@ -45,7 +55,11 @@ async function getListOrderHandler(req, rep) {
 };
 
 async function createShopHandler(req, rep) {
-  const response = await SellerService.createShop(req.body, req.user.id);
+  const body = {
+    ...req.body,
+    id_user: req.user.id,
+  }
+  const response = await SellerService.createShop(body);
   return rep.send(response);
 };
 
@@ -68,7 +82,7 @@ module.exports = async (fastify) => {
 
   fastify.post('/create-product', { schema: createProduct, preValidation: [fastify.auth, fastify.auth_seller] }, createProductHandler);
   fastify.put('/edit-product/:id', { schema: editProduct, preValidation: [fastify.auth, fastify.auth_seller] }, editProductHandler);
-  fastify.del('/del-product/:id', { schema: delProduct, preValidation: [fastify.auth, fastify.auth_seller] }, delProductHandler);
+  fastify.delete('/del-product/:id', { schema: delProduct, preValidation: [fastify.auth, fastify.auth_seller] }, delProductHandler);
   fastify.get('/get-product/:id', { schema: getProduct, preValidation: [fastify.auth, fastify.auth_seller] }, getProductHandler);
   fastify.get('/get-list-product/:idShop', { schema: getListProduct, preValidation: [fastify.auth, fastify.auth_seller] }, getListProductHandler);
 
@@ -78,7 +92,7 @@ module.exports = async (fastify) => {
 
   fastify.post('/create-shop', { schema: createShop, preValidation: [fastify.auth, fastify.auth_seller] }, createShopHandler);
   fastify.put('/edit-shop/:id', { schema: editShop, preValidation: [fastify.auth, fastify.auth_seller] }, editShopHandler);
-  fastify.del('/del-shop/:id', { schema: delShop, preValidation: [fastify.auth, fastify.auth_seller] }, delShopHandler);
+  fastify.delete('/del-shop/:id', { schema: delShop, preValidation: [fastify.auth, fastify.auth_seller] }, delShopHandler);
   fastify.get('/get-list-shop', { schema: getListShop, preValidation: [fastify.auth, fastify.auth_seller] }, getListShopHandler);
 
   fastify.setErrorHandler((error, req, rep) => {
