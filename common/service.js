@@ -151,7 +151,7 @@ const CommonService = {
     }
   },
 
-  async searchProduct({ page, size, name, priceMin, priceMax }) {
+  async searchProduct({ page, size, name, priceMin, priceMax }, host) {
     const query = pg('product');
     page = +page || PAGINATION.INDEX;
     size = +size || PAGINATION.SIZE;
@@ -171,8 +171,14 @@ const CommonService = {
     const lstIdProduct = lstProduct.map((item) => item.id);
     const lstImageProduct = await pg('productImage')
       .whereIn('id_product', lstIdProduct).select('id_product', 'image');
-    for (let i = 0; i < lstProduct; i++) {
-      lstProduct[i].images = lstImageProduct.filter((item) => item.id_product === lstIdProduct[i].id);
+    console.log(lstImageProduct);
+    for (let i = 0; i < lstProduct.length; i++) {
+      lstProduct[i].images = lstImageProduct.reduce((init, item) => {
+        if (item.id_product === lstIdProduct[i]) {
+          init.push(`${host}/public/img/${item.image}`);
+        }
+        return init;
+      }, []);
     }
     return {
       code: 0,
@@ -186,7 +192,7 @@ const CommonService = {
     }
   },
 
-  async getDetailProduct(idProduct) {
+  async getDetailProduct(idProduct, host) {
     const product = await pg('product')
       .where({ id: idProduct })
       .leftJoin('shop', 'product.id_shop', 'shop.id')
@@ -196,7 +202,7 @@ const CommonService = {
     const imageProduct = await pg('productImage')
       .where({ id_product: idProduct })
       .select('image');
-    product.images = imageProduct.map(item => item.image);
+    product.images = imageProduct.map(item => `${host}/public/img/${item.image}`);
     return {
       code: 0,
       message: MESSAGE.SEARCH_PRODUCT_SUCCESS,

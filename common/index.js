@@ -32,12 +32,12 @@ async function changePasswordHandler(req, rep) {
 }
 
 async function searchProductHandler(req, rep) {
-  const response = await CommonService.searchProduct(req.query);
+  const response = await CommonService.searchProduct(req.query, req.headers.host);
   return rep.send(response);
 }
 
 async function getDetailProductHandler(req, rep) {
-  const response = await CommonService.getDetailProduct(req.params.id);
+  const response = await CommonService.getDetailProduct(req.params.id, req.headers.host);
   return rep.send(response);
 }
 
@@ -50,9 +50,6 @@ module.exports = async (fastify) => {
   });
   fastify.post('/change-profile', { schema: changeProfile }, changeProfileHandler);
   fastify.post('/change-password', { schema: changePassword }, changePasswordHandler);
-  fastify.get('/test', {}, (req, rep) => {
-    return rep.send('ok');
-  });
   fastify.get('/search-product', { schema: searchProduct }, searchProductHandler);
   fastify.get('/detail-product/:id', { schema: detailProduct }, getDetailProductHandler);
 

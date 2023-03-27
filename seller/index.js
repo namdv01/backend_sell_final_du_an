@@ -18,6 +18,7 @@ async function editProductHandler(req, rep) {
   const body = {
     id_product: req.params.id,
     id_user: req.user.id,
+    host: req.headers.host,
     ...req.body,
   }
   const response = await SellerService.editProduct(body);
@@ -30,12 +31,16 @@ async function delProductHandler(req, rep) {
 };
 
 async function getProductHandler(req, rep) {
-  const response = await SellerService.getProduct(req.params.id);
+  const response = await SellerService.getProduct(req.user.id, req.params.id);
   return rep.send(response);
 };
 
 async function getListProductHandler(req, rep) {
-  const response = await SellerService.getListProduct(req.user.id, req.params.idShop);
+  const query = {
+    idShop: req.params.idShop,
+    ...req.query,
+  }
+  const response = await SellerService.getListProduct(req.user.id, query);
   return rep.send(response);
 };
 
@@ -64,7 +69,13 @@ async function createShopHandler(req, rep) {
 };
 
 async function editShopHandler(req, rep) {
-  const response = await SellerService.editShop(req.body, req.user.id, req.params.id);
+  const body = {
+    ...req.body,
+    id_user: req.user.id,
+    id_shop: req.params.id,
+    host: req.headers.host,
+  }
+  const response = await SellerService.editShop(body);
   return rep.send(response);
 };
 
@@ -74,7 +85,12 @@ async function delShopHandler(req, rep) {
 };
 
 async function getListShopHandler(req, rep) {
-  const response = await SellerService.getListShop(req.user.id);
+  const query = {
+    ...req.query,
+    id_user: req.user.id,
+    host: req.headers.host,
+  }
+  const response = await SellerService.getListShop(query);
   return rep.send(response);
 };
 

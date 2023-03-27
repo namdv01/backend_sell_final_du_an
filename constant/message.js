@@ -26,6 +26,10 @@ const MESSAGE = {
   LOGIN_SUCCESS: 'Đăng nhập thành công',
   CREATE_SHOP_SUCCESS: 'Tạo gian hàng thành công',
   CREATE_PRODUCT_SUCCESS: 'Tạo thêm sản phẩm thành công',
+  EDIT_PRODUCT_SUCCESS: 'Chỉnh sửa sản phẩm thành công',
+  DEL_PRODUCT_SUCCESS: 'Xóa sản phẩm thành công',
+  EDIT_SHOP_SUCCESS: 'Sửa thông tin gian hàng thành công',
+  DEL_SHOP_SUCCESS: 'Xóa gian hàng thành công',
   CHANGE_PASSWORD_SUCCESS: 'Đổi mật khẩu thành công',
   EMAIL_RESET_PASSWORD_BE_SEND: 'Email yêu cầu đổi mật khẩu được gửi',
   SUBJECT_FORGET_PASSWORD: 'THAY ĐỔI MẬT KHẨU',
@@ -53,6 +57,8 @@ const MESSAGE = {
   LOGO_SHOP_REQUIRED: 'thiếu logo gian hàng',
   NOT_OWN_SHOP: 'Gian hàng không thuộc quản lý',
   IMAGE_INVALID: 'Ảnh không hợp lệ',
+  NOT_OWN_PRODUCT: 'Sản phẩm không thuộc quản lý',
+  LIMIT_CREATE_SHOP: 'Bạn đang bị giới hạn khả năng tạo gian hàng',
 }
 
 module.exports = MESSAGE;

@@ -75,7 +75,13 @@ const editProduct = {
       idShop: {
         ...baseSchema.id
       },
-      images: {
+      imagesAdd: {
+        type: 'array',
+        errorMessage: {
+          _: MESSAGE.IMAGE_ARRAY
+        }
+      },
+      imagesRemove: {
         type: 'array',
         errorMessage: {
           _: MESSAGE.IMAGE_ARRAY
