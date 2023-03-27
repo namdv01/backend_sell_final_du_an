@@ -56,9 +56,13 @@ const MESSAGE = {
   ADDRESS_SHOP_REQUIRED: 'thiếu địa chỉ gian hàng',
   LOGO_SHOP_REQUIRED: 'thiếu logo gian hàng',
   NOT_OWN_SHOP: 'Gian hàng không thuộc quản lý',
+  NOT_OWN_ORDER: 'Đơn hàng không thuộc quyền quản lý',
   IMAGE_INVALID: 'Ảnh không hợp lệ',
   NOT_OWN_PRODUCT: 'Sản phẩm không thuộc quản lý',
   LIMIT_CREATE_SHOP: 'Bạn đang bị giới hạn khả năng tạo gian hàng',
+  EDIT_ORDER_SUCCESS: 'Thay đổi thông tin đơn hàng thành công',
+  GET_ORDER_SUCCESS: 'Lấy thông tin đơn hàng thành công',
+  GET_LST_ORDER_SUCCESS: 'Lấy danh sách đơn hàng của gian hàng thành công',
 }
 
 module.exports = MESSAGE;

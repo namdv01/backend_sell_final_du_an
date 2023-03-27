@@ -45,17 +45,31 @@ async function getListProductHandler(req, rep) {
 };
 
 async function editOrderHandler(req, rep) {
-  const response = await SellerService.editOrder(req.body, req.user.id, req.params.id);
+  const query = {
+    ...req.body,
+    idUser: req.user.id,
+    idOrder: req.params.id
+  }
+  const response = await SellerService.editOrder(query);
   return rep.send(response);
 };
 
 async function getOrderHandler(req, rep) {
-  const response = await SellerService.getOrder(req.user.id, req.params.id);
+  const query = {
+    idUser: req.user.id,
+    idOrder: req.params.id
+  }
+  const response = await SellerService.getOrder(query);
   return rep.send(response);
 };
 
 async function getListOrderHandler(req, rep) {
-  const response = await SellerService.getListOrder(req.user.id, req.params.idShop);
+  const query = {
+    ...req.query,
+    idUder: req.user.id,
+    idShop: req.params.idShop
+  }
+  const response = await SellerService.getListOrder(query);
   return rep.send(response);
 };
 

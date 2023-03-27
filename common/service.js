@@ -29,7 +29,6 @@ const CommonService = {
     const publicAvatar = imageService.convertImage(avatar, 'avatar');
 
     const id = v4();
-    console.log(id);
     const dataSave = {
       email,
       password: passwordService.hash(password),
@@ -171,7 +170,6 @@ const CommonService = {
     const lstIdProduct = lstProduct.map((item) => item.id);
     const lstImageProduct = await pg('productImage')
       .whereIn('id_product', lstIdProduct).select('id_product', 'image');
-    console.log(lstImageProduct);
     for (let i = 0; i < lstProduct.length; i++) {
       lstProduct[i].images = lstImageProduct.reduce((init, item) => {
         if (item.id_product === lstIdProduct[i]) {

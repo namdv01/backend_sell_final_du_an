@@ -117,7 +117,6 @@ const SellerService = {
     });
     // lấy toàn bộ ảnh sản phẩm hiện tại
     const curImage = await pg.from('productImage').where('id_product', id_product).select('image');
-    console.log(curImage.length + 'yyy');
     newProduct[0].images = curImage.map((i) => `${host}/public/img/${i.image}`);
     return {
       code: 0,
@@ -282,7 +281,7 @@ const SellerService = {
     }
   },
 
-  async delShopHandler(idUser, idShop) {
+  async delShop(idUser, idShop) {
     const shop = await pg.from('shop').where({
       id: idShop,
       id_user: idUser
@@ -329,7 +328,132 @@ const SellerService = {
         totalPage: Math.ceil(+totalShop.total / pageSize),
       }
     }
-  }
+  },
+
+  // order
+  async editOrder(query) {
+    const { idOrder, idUser, status, payment } = query;
+    const order = await pg.from('order')
+      .join('orderDetail', 'order.id', 'orderDetail.id_order')
+      .where('order.id', idOrder)
+      .join('product', 'product.id', 'orderDetail.id_product')
+      .join('shop', 'shop.id', 'product.id_shop')
+      .andWhere('shop.id_user', idUser).first();
+    if (!order) {
+      return {
+        code: 400,
+        message: MESSAGE.NOT_OWN_ORDER
+      }
+    }
+    const formUpdate = {};
+    if (status) {
+      formUpdate.status = status;
+    }
+    if (payment !== undefined) {
+      formUpdate.payment = !!payment;
+    }
+    await pg.from('order').update(formUpdate).where('id', idOrder);
+
+    return {
+      code: 0,
+      message: MESSAGE.EDIT_ORDER_SUCCESS
+    }
+  },
+
+  async getOrder(query) {
+    const { idUser, idOrder } = query;
+    const order = await pg.from('order')
+      .join('orderDetail', 'order.id', 'orderDetail.id_order')
+      .where('order.id', idOrder)
+      .join('product', 'product.id', 'orderDetail.id_product')
+      .join('shop', 'shop.id', 'product.id_shop')
+      .andWhere('shop.id_user', idUser)
+      .select({
+        id: 'order.id',
+        id_buyer: 'order.id_buyer',
+        status: 'order.status',
+        date: 'order.date',
+        payment: 'order.payment',
+      }).first();
+
+    if (!order) {
+      return {
+        code: 400,
+        message: MESSAGE.NOT_OWN_ORDER
+      }
+    }
+    const detailOrder = await pg.from('orderDetail').where('id_order', idOrder)
+      .join('product', 'product.id', 'orderDetail.id_product')
+      .select({
+        'name': 'product.name',
+        'quantity': 'orderDetail.quantity',
+        'price': 'orderDetail.price',
+      });
+    order.detail = detailOrder;
+    return {
+      code: 0,
+      message: MESSAGE.GET_ORDER_SUCCESS,
+      payload: order,
+    }
+  },
+
+  async getListOrder(query) {
+    let { idUser, idShop, pageIndex, pageSize } = query;
+    pageIndex = +pageIndex || 1;
+    pageSize = +pageSize || 20;
+    const checkOwn = await pg.from('shop').where({
+      id: idShop,
+      id_user: idUser
+    }).first();
+    if (!checkOwn) {
+      return {
+        code: 400,
+        message: MESSAGE.NOT_OWN_SHOP
+      }
+    }
+
+    const ques = pg.from('order');
+    const totalOrder = await ques.clone().count('*').first();
+
+    const orders = await ques
+      .limit(pageSize)
+    offset((pageIndex - 1) * pageSize);
+
+    const listIdOrder = orders.map((i) => i.id);
+    const detailOrders = await pg.from('orderDetail')
+      .whereIn('id_order', listIdOrder)
+      .join('product', 'product.id', 'orderDetail.id_product')
+      .select({
+        'id_order': 'orderDetail.id',
+        'name': 'product.name',
+        'quantity': 'orderDetail.quantity',
+        'price': 'orderDetail.price',
+      });
+    const fixOrder = orders.map((o) => {
+      o.detail = detailOrders.reduce((init, de) => {
+        if (de.id_order === o.id) {
+          init.push({
+            name: de.name,
+            quantity: de.quantity,
+            price: de.price
+          })
+        }
+        return init;
+      }, []);
+      return o;
+    });
+
+    return {
+      code: 0,
+      message: MESSAGE.GET_LST_ORDER_SUCCESS,
+      payload: {
+        orders: fixOrder,
+        pageSize,
+        pageIndex,
+        totalPage: Math.ceil(+totalOrder.total / pageSize)
+      }
+    }
+  },
 }
 
 module.exports = SellerService;

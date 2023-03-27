@@ -169,6 +169,14 @@ const getOrder = {
   params: {
     additionalProperties: false,
     properties: {
+      idShop: {
+        ...baseSchema.id,
+      }
+    }
+  },
+  params: {
+    additionalProperties: false,
+    properties: {
       id: {
         ...baseSchema.id,
       }
