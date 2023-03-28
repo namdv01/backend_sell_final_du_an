@@ -48,8 +48,8 @@ module.exports = async (fastify) => {
   fastify.get('/test_authen', { preValidation: [fastify.auth] }, async (req, res) => {
     return res.send('on');
   });
-  fastify.post('/change-profile', { schema: changeProfile }, changeProfileHandler);
-  fastify.post('/change-password', { schema: changePassword }, changePasswordHandler);
+  fastify.post('/change-profile', { schema: changeProfile, preValidation: [fastify.auth] }, changeProfileHandler);
+  fastify.post('/change-password', { schema: changePassword, preValidation: [fastify.auth] }, changePasswordHandler);
   fastify.get('/search-product', { schema: searchProduct }, searchProductHandler);
   fastify.get('/detail-product/:id', { schema: detailProduct }, getDetailProductHandler);
 

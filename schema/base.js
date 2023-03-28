@@ -51,6 +51,12 @@ const baseSchema = {
     transform: ['trim'],
     minLength: 1,
   },
+  avatar: {
+    type: 'string',
+  },
+  numberShop: {
+    type: 'integer',
+  },
   role: {
     type: 'string',
     enum: ['admin', 'seller', 'buyer']
@@ -92,6 +98,16 @@ const baseSchema = {
   },
   logo: {
     type: 'string',
+  },
+  content: {
+    type: 'string',
+    minLength: 1,
+    transform: ['trim'],
+  },
+  star: {
+    type: 'integer',
+    minimum: 1,
+    maximum: 5,
   }
 };
 

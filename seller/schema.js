@@ -77,12 +77,18 @@ const editProduct = {
       },
       imagesAdd: {
         type: 'array',
+        items: {
+          type: 'string'
+        },
         errorMessage: {
           _: MESSAGE.IMAGE_ARRAY
         }
       },
       imagesRemove: {
         type: 'array',
+        items: {
+          type: 'string'
+        },
         errorMessage: {
           _: MESSAGE.IMAGE_ARRAY
         }
@@ -94,9 +100,10 @@ const editProduct = {
 const delProduct = {
   response: baseSchema.response,
   params: {
+    additionalProperties: false,
     properties: {
       id: {
-        type: 'string',
+        ...baseSchema.id
       }
     }
   }
@@ -174,14 +181,6 @@ const getOrder = {
       }
     }
   },
-  params: {
-    additionalProperties: false,
-    properties: {
-      id: {
-        ...baseSchema.id,
-      }
-    }
-  }
 };
 
 const getListOrder = {
@@ -229,7 +228,6 @@ const createShop = {
       }
     }
   }
-
 };
 
 const editShop = {

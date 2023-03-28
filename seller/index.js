@@ -77,6 +77,7 @@ async function createShopHandler(req, rep) {
   const body = {
     ...req.body,
     id_user: req.user.id,
+    host: req.headers.host,
   }
   const response = await SellerService.createShop(body);
   return rep.send(response);

@@ -33,7 +33,7 @@ const register = {
         }
       },
       avatar: {
-        type: 'string',
+        ...baseSchema.avatar,
         errorMessage: {
           _: MESSAGE.AVATAR_INVALID
         }

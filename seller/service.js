@@ -210,7 +210,7 @@ const SellerService = {
         products: listProduct,
         pageIndex,
         pageSize,
-        totalPage: Math.ceil(+totalProduct.total / pageSize),
+        totalPage: Math.ceil(+totalProduct.count / pageSize),
       },
     }
   },
@@ -218,11 +218,11 @@ const SellerService = {
 
   //shop
   async createShop(body) {
-    const { name, id_user, address, logo } = body;
+    const { name, id_user, address, logo, host } = body;
     const checkLimitShop = await pg.from('user').where({
       id: id_user
     }).count('numberShop').first();
-    if (checkLimitShop.total <= 0) {
+    if (checkLimitShop.count <= 0) {
       return {
         code: 400,
         message: MESSAGE.LIMIT_CREATE_SHOP
@@ -242,10 +242,14 @@ const SellerService = {
       logo: publicLogo,
       id,
     }
-    await pg.from('shop').insert(dataSave);
+    const saveShop = await pg.from('shop').insert(dataSave).returning('*').first();
     return {
       code: 0,
       message: MESSAGE.CREATE_SHOP_SUCCESS,
+      payload: {
+        ...saveShop,
+        logo: `${host}/public/img/${saveShop.logo}`,
+      }
     }
   },
 
@@ -325,7 +329,7 @@ const SellerService = {
         shop: fixShop,
         pageIndex,
         pageSize,
-        totalPage: Math.ceil(+totalShop.total / pageSize),
+        totalPage: Math.ceil(+totalShop.count / pageSize),
       }
     }
   },
@@ -450,7 +454,7 @@ const SellerService = {
         orders: fixOrder,
         pageSize,
         pageIndex,
-        totalPage: Math.ceil(+totalOrder.total / pageSize)
+        totalPage: Math.ceil(+totalOrder.count / pageSize)
       }
     }
   },

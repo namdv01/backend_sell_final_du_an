@@ -4,108 +4,163 @@ const MESSAGE = require('../constant/message');
 
 const AdminService = {
   async getListUser(query) {
+    let { id, role, pageSize, pageIndex, host } = query;
     const ques = pg('user');
     let lstUser;
-    if (query.id) {
-      lstUser = await ques.where({ id: query.id }).first();
-    }
-
-    if (query.id && !lstUser) {
-      throw new Error(MESSAGE.ID_NOK);
-    } else if (query.id) {
-      delete lstUser.password;
+    if (id) {
+      lstUser = await ques.clone().where({ id }).first()
+        .select('id', 'email', 'fullname', 'phone', 'avatar', 'gender', 'role', 'numberShop');
+      if (!lstUser) {
+        throw new Error(MESSAGE.ID_NOK);
+      }
+      lstUser.avatar = `${host}/public/img/${lstUser.avatar}`;
       return {
         code: 0,
         message: MESSAGE.GET_LIST_USER_SUCCESS,
-        payload: lstUser,
+        payload: lstUser
       }
-    };
-
-    if (query.role) {
+    }
+    if (role) {
       ques.where({ role });
     }
-    query.size = +query.size || PAGINATION.SIZE;
-    query.page = +query.page || PAGINATION.INDEX;
-    const totalUser = await ques.clone().count().first();
-    lstUser = await ques.limit(query.size).offset((query.page - 1) * query.size);
-    lstUser = lstUser.map(({ password, ...rest }) => rest);
+    pageSize = +pageSize || PAGINATION.SIZE;
+    pageIndex = +pageIndex || PAGINATION.INDEX;
+    const totalUser = await ques.clone().count('*').first();
+    lstUser = await ques.limit(pageSize).offset((pageIndex - 1) * pageSize)
+      .select('id', 'email', 'fullname', 'phone', 'avatar', 'gender', 'role', 'numberShop');
+    lstUser = lstUser.map((u) => ({ ...u, avatar: `${host}/public/img/${u.avatar}` }));
     return {
       code: 0,
       message: MESSAGE.GET_LIST_USER_SUCCESS,
       payload: {
         users: lstUser,
-        page: query.page,
-        size: query.size,
-        totalPage: Math.ceil(totalUser.count / query.size),
-      },
+        pageSize,
+        pageIndex,
+        totalPage: Math.ceil(+totalUser.count / pageSize),
+      }
     }
   },
 
   async getListShop(query) {
+    const { id, idUser, pageIndex, pageSize, host } = query;
     const ques = pg('shop');
     let lstShop;
-    if (query.id) {
-      lstUser = await ques.where({ id: query.id }).first();
-    }
-
-    if (query.id && !lstShop) {
-      throw new Error(MESSAGE.ID_NOK);
-    } else if (query.id) {
+    if (id) {
+      lstShop = await ques.where({ id }).first();
+      if (!lstShop) {
+        throw new Error(MESSAGE.ID_NOK);
+      }
+      lstShop.logo = `${host}/public/img/${lstShop.logo}`;
       return {
         code: 0,
         message: MESSAGE.GET_LIST_SHOP_SUCCESS,
         payload: lstShop,
       }
-    };
-
-    if (query.name) {
-      ques.whereILike({ name: query.name });
     }
-    query.size = +query.size || PAGINATION.SIZE;
-    query.page = +query.page || PAGINATION.INDEX;
-    const totalShop = await ques.clone().count().first();
-    lstShop = await ques.limit(query.size).offset((query.page - 1) * query.size);
+    if (idUser) {
+      ques.where({ id_user: idUser });
+    }
+    const totalShop = await ques.clone().count('*').first();
+    pageSize = +pageSize || PAGINATION.SIZE;
+    pageIndex = +pageIndex || PAGINATION.INDEX;
+    lstShop = await ques.limit(pageSize).offset((pageIndex - 1) * pageSize);
+    lstShop = lstShop.map((shop) => ({ ...shop, logo: `${host}/public/img/${shop.logo}` }));
     return {
       code: 0,
-      message: MESSAGE.GET_LIST_SHOP_SUCCESS,
+      message: MESSAGE.GET_LIST_PRODUCT_SUCCESS,
       payload: {
-        users: lstShop,
-        page: query.page,
-        size: query.size,
-        totalPage: Math.ceil(totalShop.count / query.size),
-      },
+        shops: lstShop,
+        pageIndex,
+        pageSize,
+        totalPage: Math.ceil(+totalShop.count / pageSize),
+      }
     }
   },
 
   async getListProduct(query) {
+    const { id, idShop, pageIndex, pageSize } = query;
     const ques = pg('product');
     let lstProduct;
-    if (query.id) {
-      lstProduct = await ques.where({ id: query.id }).first();
+    let lstImage;
+    if (id) {
+      lstProduct = await ques.where({ id }).first();
       if (!lstProduct) {
         throw new Error(MESSAGE.ID_NOK);
       }
-      const productImage = await pg('productImage').where({ id_product: query.id }).select('image');
-      lstProduct.images = productImage;
+      lstImage = await pg.from('productImage').where({ id_product: id }).select('image');
+      lstImage = lstImage.map((image) => `${host}/public/img/${image.image}`);
+      lstProduct.images = lstImage;
       return {
         code: 0,
         message: MESSAGE.GET_LIST_PRODUCT_SUCCESS,
-        payload: lstProduct
+        payload: lstProduct,
       }
     }
-    if (query.name) {
-      ques.whereILike({ name: query.name });
+    if (idShop) {
+      ques.where({ id_shop: idShop });
     }
-    if (query.priceMin) {
-      ques.where('price', '>=', query.priceMin);
+    const totalProduct = await ques.clone().count('*').first();
+    pageSize = +pageSize || PAGINATION.SIZE;
+    pageIndex = +pageIndex || PAGINATION.INDEX;
+    lstProduct = await ques().limit(pageSize).offset((pageIndex - 1) * pageSize);
+    const lstIdProduct = lstProduct.map((pro) => pro.id);
+    lstImage = await pg.from('productImage').whereIn('id_product', lstIdProduct).select('image', 'id_product');
+    lstProduct = lstProduct.map((pro) => {
+      pro.images = lstImage.reduce((init, im) => {
+        if (im.id_product === pro.id) {
+          init.push(im.image);
+        }
+        return init;
+      }, []);
+      return pro;
+    });
+    return {
+      code: 0,
+      message: MESSAGE.GET_LIST_PRODUCT_SUCCESS,
+      payload: {
+        products: lstProduct,
+        pageSize,
+        pageIndex,
+        totalPage: Math.ceil(+totalProduct.count / pageSize),
+      }
     }
-    if (query.priceMax) {
-      ques.where('price', '<=', query.priceMax);
-    }
-    lstProduct = await ques.select
   },
 
+  async getListOrder(query) {
 
+  },
+
+  async getListComment(query) {
+
+  },
+
+  async editUser(body) {
+
+  },
+
+  async editShop(body) {
+
+  },
+
+  async editOrder(body) {
+
+  },
+
+  async createShop(body) {
+
+  },
+
+  async createProduct(body) {
+
+  },
+
+  async delShop(idShop) {
+
+  },
+
+  async delProduct(idProduct) {
+
+  },
 }
 
 module.exports = AdminService;
