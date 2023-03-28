@@ -430,4 +430,5 @@ module.exports = {
   createShopSchema,
   createProductSchema,
   delShopSchema,
+  delProductSchema,
 }

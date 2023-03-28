@@ -127,7 +127,74 @@ const AdminService = {
   },
 
   async getListOrder(query) {
+    let { id, idBuyer, status, payment, pageIndex, pageSize } = query;
+    let listOrder;
+    let detailOrder;
+    const ques = pg.from('order');
+    if (id) {
+      listOrder = await ques.where({ id }).first();
+      if (!listOrder) {
+        throw new Error(MESSAGE.ID_NOK);
+      }
+      detailOrder = await pg.from('orderDetail').where({ id_order: id })
+        .join('product', 'product.id', 'orderDetail.id_product')
+        .select({
+          id: 'orderDetail.id',
+          name: 'product.name',
+          price: 'orderDetail.price',
+          quantity: 'orderDetail.quantity',
+        });
+      listOrder.detail = detailOrder;
+      return {
+        code: 0,
+        message: MESSAGE.GET_LIST_ORDER_SUCCESS,
+        payload: detailOrder,
+      }
+    }
+    if (idBuyer) {
+      ques.where('id_buyer', idBuyer);
+    }
+    if (status) {
+      ques.where('status', status);
+    }
+    if (payment) {
+      ques.where('payment', payment);
+    }
+    const totalOrder = await ques.clone().count('*').first();
+    pageSize = +pageSize || PAGINATION.SIZE;
+    pageIndex = +pageIndex || PAGINATION.INDEX;
+    listOrder = await ques.limit(pageSize).offset((pageIndex - 1) * pageSize);
+    const listIdOrder = listOrder.map((lo) => lo.id);
+    detailOrder = await pg.from('orderDetail').whereIn('id_order', listIdOrder)
+      .join('product', 'product.id', 'orderDetail.id_product')
+      .select({
+        id: 'orderDetail.id',
+        id_order: 'orderDetail.id_order',
+        name: 'product.name',
+        price: 'orderDetail.price',
+        quantity: 'orderDetail.quantity',
+      });
+    listOrder = listOrder.map((lo) => {
+      lo.detail = detailOrder.reduce((init, de) => {
+        if (de.id_order === lo.id) {
+          const { id_order, ...rest } = de;
+          init.push(rest);
+        }
+        return init;
+      }, []);
+      return lo;
+    });
 
+    return {
+      code: 0,
+      message: MESSAGE.GET_LIST_ORDER_SUCCESS,
+      payload: {
+        orders: listOrder,
+        pageSize,
+        pageIndex,
+        totalPage: Math.ceil(+totalOrder.count / pageSize),
+      }
+    }
   },
 
   async getListComment(query) {
