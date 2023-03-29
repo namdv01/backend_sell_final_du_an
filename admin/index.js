@@ -61,7 +61,6 @@ async function editOrderHandler(req, rep) {
   const body = {
     ...req.body,
     idOrder: req.params.id,
-    host: req.headers.host,
   }
   const response = await AdminService.editOrder(body);
   return rep.send(response);
@@ -82,7 +81,6 @@ async function createShopHandler(req, rep) {
     ...req.body,
     host: req.headers.host,
   }
-
   const response = await AdminService.createShop(body);
   return rep.send(response);
 }
@@ -92,7 +90,6 @@ async function createProductHandler(req, rep) {
     ...req.body,
     host: req.headers.host,
   }
-
   const response = await AdminService.createProduct(body);
   return rep.send(response);
 }

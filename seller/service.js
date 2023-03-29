@@ -86,7 +86,7 @@ const SellerService = {
     let newProduct = {};
     await pg.transaction(async (trx) => {
       newProduct = await pg.from('product').where('product.id', id_product)
-        .update(formUpdate).returning('*').transacting(trx);
+        .update(formUpdate).returning('*').first().transacting(trx);
 
       if (imagesAdd && imagesAdd.length > 0) {
         imagesAdd.forEach(async (image) => {
@@ -146,7 +146,7 @@ const SellerService = {
     });
     return {
       code: 0,
-      message: MESSAGE
+      message: MESSAGE.DEL_PRODUCT_SUCCESS,
     }
   },
 

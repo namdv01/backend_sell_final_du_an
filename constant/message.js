@@ -46,6 +46,7 @@ const MESSAGE = {
   GET_LIST_SHOP_SUCCESS: 'lấy danh sách gian hàng thành công',
   GET_LIST_PRODUCT_SUCCESS: 'lấy danh sách sản phẩm thành công',
   GET_LIST_ORDER_SUCCESS: 'lấy danh sách đơn hàng thành công',
+  GET_LIST_COMMENT_SUCCESS: 'lấy danh sách bình luận thành công',
   MAX_PRICE_NOK: 'giá tối đa không hợp lệ',
   MIN_PRICE_NOK: 'giá tối thiểu không hợp lệ',
   PRICE_NOK: 'giá không hợp lệ',
@@ -70,6 +71,7 @@ const MESSAGE = {
   NOT_OWN_PRODUCT: 'Sản phẩm không thuộc quản lý',
   LIMIT_CREATE_SHOP: 'Bạn đang bị giới hạn khả năng tạo gian hàng',
   EDIT_ORDER_SUCCESS: 'Thay đổi thông tin đơn hàng thành công',
+  EDIT_ORDER_FAIL: 'Không thể thay đổi thông tin đơn hàng',
   GET_ORDER_SUCCESS: 'Lấy thông tin đơn hàng thành công',
   GET_LST_ORDER_SUCCESS: 'Lấy danh sách đơn hàng của gian hàng thành công',
   COMMENT_CONTENT_NOK: 'Nội dung bình luận không hợp lệ',
@@ -78,6 +80,7 @@ const MESSAGE = {
   NOT_ACCEPT_COMMENT: 'Đã tồn tại bình luận về đơn hàng và sản phẩm',
   COMMENT_SUCCESS: 'Bình luận thành công',
   GET_DETAIL_ORDER_SUCCESS: 'Lấy chi tiết đơn hàng thành công',
+  NOT_UPDATE_ACCEPT: 'Thay đổi không hợp lệ',
 }
 
 module.exports = MESSAGE;
