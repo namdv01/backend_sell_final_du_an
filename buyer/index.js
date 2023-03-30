@@ -48,7 +48,7 @@ async function detailOrderHandler(req, rep) {
 }
 
 module.exports = async (fastify) => {
-  fastify.post('/order', { schema: orderSchema, preValidation: [fastify.auth, fastify.auth_buyer] }, orderHandler);
+  fastify.post('/order', { schema: orderSchema, preValidation: [fastify.auth, fastify.auth_buyer] }, orderHandler); // done
   fastify.put('/edit-order', { schema: editOrderSchema, preValidation: [fastify.auth, fastify.auth_buyer] }, editOrderHandler);
   fastify.post('/comment', { schema: commentSchema, preValidation: [fastify.auth, fastify.auth_buyer] }, commentHandler);
   fastify.get('/get-list-order', { schema: getListOrderSchema, preValidation: [fastify.auth, fastify.auth_buyer] }, getListOrderHandler);

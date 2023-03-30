@@ -42,16 +42,16 @@ async function getDetailProductHandler(req, rep) {
 }
 
 module.exports = async (fastify) => {
-  fastify.post('/register', { schema: register }, registerHandler);
-  fastify.post('/login', { schema: login }, loginHandler);
+  fastify.post('/register', { schema: register }, registerHandler); // done
+  fastify.post('/login', { schema: login }, loginHandler); // done
   fastify.get('/check-login', { schema: checkLogin }, checkLoginHandler);
   fastify.get('/test_authen', { preValidation: [fastify.auth] }, async (req, res) => {
     return res.send('on');
   });
-  fastify.post('/change-profile', { schema: changeProfile, preValidation: [fastify.auth] }, changeProfileHandler);
-  fastify.post('/change-password', { schema: changePassword, preValidation: [fastify.auth] }, changePasswordHandler);
-  fastify.get('/search-product', { schema: searchProduct }, searchProductHandler);
-  fastify.get('/detail-product/:id', { schema: detailProduct }, getDetailProductHandler);
+  fastify.post('/change-profile', { schema: changeProfile, preValidation: [fastify.auth] }, changeProfileHandler);  // done
+  fastify.post('/change-password', { schema: changePassword, preValidation: [fastify.auth] }, changePasswordHandler); // done
+  fastify.get('/search-product', { schema: searchProduct }, searchProductHandler);  // done
+  fastify.get('/detail-product/:id', { schema: detailProduct }, getDetailProductHandler); // done
 
   fastify.setErrorHandler((error, req, rep) => {
     return rep.code(200).send({ code: -1, message: error.message });

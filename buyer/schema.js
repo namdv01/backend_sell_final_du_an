@@ -15,6 +15,9 @@ const orderSchema = {
           properties: {
             idProduct: {
               ...baseSchema.id,
+              errorMessage: {
+                _: MESSAGE.ID_NOK,
+              }
             },
             quantity: {
               ...baseSchema.quantity,

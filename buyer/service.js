@@ -2,45 +2,46 @@ const { v4 } = require('uuid');
 const { connectPg: pg } = require('../base/connectDb');
 const { PAGINATION } = require('../constant');
 const MESSAGE = require('../constant/message');
+const dayjs = require('../base/dayjs');
 
 const BuyerService = {
   async order(body) {
     const { detail, idUser } = body;
     let newOrder = {};
     let newDetail = [];
+    let globalTrx;
     await pg.transaction(async (trx) => {
       newOrder = await pg.from('order').insert({
         id: v4(),
         id_buyer: idUser,
         status: 'watting', // mặc định
-        date: Date.now(),
+        date: dayjs.getDate(),
         payment: false,
-      }).returing('id').first().transaction(trx);
+      }).returning('id').transacting(trx);
       const listProduct = detail.map((de) => de.idProduct);
       const listProductCost = await pg.from('product').whereIn('id', listProduct)
-        .select('id', 'price', 'quantity').transaction(trx);
-      const fixDetail = detail.map(async (de) => {
+        .select('id', 'price', 'quantity').transacting(trx);
+      const fixDetail = detail.map((de) => {
         const product = listProductCost.find((co) => co.id === de.idProduct);
         if (product.quantity < de.quantity) {
-          await trx.rollback();
-          throw new Error(MESSAGE.ORDER_FAIL);
+          throw new Error(MESSAGE.ORDER_FAIL); // auto rollback
         }
         return {
           id: v4(),
-          id_order: newOrder.id,
+          id_order: newOrder[0].id,
           id_product: de.idProduct,
           quantity: de.quantity,
           price: product.price,
         }
       });
       newDetail = await pg.from('orderDetail').insert(fixDetail)
-        .returing('*').transaction(trx);
+        .returning('*').transacting(trx);
     });
-    newOrder.detail = newDetail;
+    newOrder[0].detail = newDetail;
     return {
       code: 0,
       message: MESSAGE.ORDER_SUCCESS,
-      payload: newOrder,
+      payload: newOrder[0],
     }
   },
 

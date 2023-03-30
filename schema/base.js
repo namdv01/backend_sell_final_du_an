@@ -62,17 +62,21 @@ const baseSchema = {
     enum: ['admin', 'seller', 'buyer']
   },
   page: {
-    type: 'integer',
+    type: 'string',
+    pattern: '^[0-9]*$'
   },
   size: {
-    type: 'integer',
+    type: 'string',
+    pattern: '^[0-9]*$'
   },
   priceMin: {
-    type: 'integer',
+    type: 'string',
+    pattern: '^[0-9]*$',
     minimum: 0,
   },
   priceMax: {
-    type: 'integer',
+    type: 'string',
+    pattern: '^[0-9]*$',
     minimum: 0,
     exclusiveMinimum: { $data: '1/priceMin' },
   },
@@ -85,6 +89,7 @@ const baseSchema = {
   },
   id: {
     type: 'string',
+    format: 'uuid',
   },
   statusOrder: {
     type: 'string',

@@ -375,7 +375,6 @@ const AdminService = {
       if (imagesAdd && imagesAdd.length > 0) {
         imagesAdd.forEach(async (image) => {
           if (!imageService.checkType(image) || imageService.sizeBase64(image) > 5) {
-            await trx.rollback();
             throw new Error(MESSAGE.IMAGE_INVALID);
           }
         });
@@ -466,7 +465,6 @@ const AdminService = {
       if (images && images.length > 0) {
         images.forEach(async (image) => {
           if (!imageService.checkType(image) || imageService.sizeBase64(image) > 5) {
-            await trx.rollback();
             throw new Error(MESSAGE.IMAGE_INVALID);
           }
         });

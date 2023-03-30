@@ -171,13 +171,13 @@ const searchProduct = {
     additionalProperties: false,
     type: 'object',
     properties: {
-      page: {
+      pageIndex: {
         ...baseSchema.page,
         errorMessage: {
           _: MESSAGE.PAGE_NOK
         }
       },
-      size: {
+      pageSize: {
         ...baseSchema.size,
         errorMessage: {
           _: MESSAGE.SIZE_NOK
@@ -204,6 +204,17 @@ const searchProduct = {
 
 const detailProduct = {
   response: baseSchema.response,
+  params: {
+    type: 'object',
+    properties: {
+      id: {
+        ...baseSchema.id,
+        errorMessage: {
+          _: MESSAGE.ID_NOK,
+        }
+      }
+    }
+  }
 }
 
 module.exports = {

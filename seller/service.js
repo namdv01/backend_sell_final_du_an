@@ -29,7 +29,6 @@ const SellerService = {
       if (images && images.length > 0) {
         images.forEach(async (image) => {
           if (!imageService.checkType(image) || imageService.sizeBase64(image) > 5) {
-            await trx.rollback();
             throw new Error(MESSAGE.IMAGE_INVALID);
           }
         });
@@ -91,7 +90,6 @@ const SellerService = {
       if (imagesAdd && imagesAdd.length > 0) {
         imagesAdd.forEach(async (image) => {
           if (!imageService.checkType(image) || imageService.sizeBase64(image) > 5) {
-            await trx.rollback();
             throw new Error(MESSAGE.IMAGE_INVALID);
           }
         });
@@ -269,7 +267,6 @@ const SellerService = {
     let newLogo = '';
     if (rest.logo) {
       if (!imageService.checkType(rest.logo) || imageService.sizeBase64(rest.logo) > 5) {
-        await trx.rollback();
         throw new Error(MESSAGE.IMAGE_INVALID);
       }
       newLogo = imageService.convertImage(rest.logo);

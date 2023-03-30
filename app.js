@@ -87,9 +87,9 @@ module.exports = async function (fastify, opts) {
     prefix: '/seller',
   });
 
-  // fastify.register(buyerRoute, {
-  //   prefix: '/buyer',
-  // });
+  fastify.register(buyerRoute, {
+    prefix: '/buyer',
+  });
 
   fastify.register(commonRoute, {
     prefix: '/',

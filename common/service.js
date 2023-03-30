@@ -45,7 +45,7 @@ const CommonService = {
     return {
       code: 0,
       message: MESSAGE.REGISTER_SUCCESS,
-      payload: dataSave,
+      // payload: dataSave,
     }
 
   },
@@ -121,13 +121,13 @@ const CommonService = {
         }
       }
     }
-    await query.update(formUpdate);
+    const updateUser = await query.update(formUpdate).returning('*');
+    delete updateUser[0].password;
+    updateUser[0].avatar = `${host}/public/img/${updateUser[0].avatar}`;
     return {
       code: 0,
       message: MESSAGE.UPDATE_PROFILE_SUCCESS,
-      payload: {
-        ...formUpdate
-      }
+      payload: updateUser[0],
     }
   },
 
@@ -146,14 +146,13 @@ const CommonService = {
     return {
       code: 0,
       message: MESSAGE.CHANGE_PASSWORD_SUCCESS,
-      payload: {},
     }
   },
 
-  async searchProduct({ page, size, name, priceMin, priceMax }, host) {
+  async searchProduct({ pageIndex, pageSize, name, priceMin, priceMax }, host) {
     const query = pg('product');
-    page = +page || PAGINATION.INDEX;
-    size = +size || PAGINATION.SIZE;
+    pageIndex = +pageIndex || PAGINATION.INDEX;
+    pageSize = +pageSize || PAGINATION.SIZE;
     if (name) {
       query.whereILike('name', `%${name}%`);
     }
@@ -165,8 +164,8 @@ const CommonService = {
     }
     const totalProduct = await query.clone().count().first();
     const lstProduct = await query
-      .limit(size)
-      .offset(size * (page - 1))
+      .limit(pageSize)
+      .offset(pageSize * (pageIndex - 1))
     const lstIdProduct = lstProduct.map((item) => item.id);
     const lstImageProduct = await pg('productImage')
       .whereIn('id_product', lstIdProduct).select('id_product', 'image');
@@ -182,9 +181,9 @@ const CommonService = {
       code: 0,
       message: MESSAGE.SEARCH_PRODUCT_SUCCESS,
       payload: {
-        page,
-        size,
-        totalPage: Math.ceil(totalProduct.count / size),
+        pageIndex,
+        pageSize,
+        totalPage: Math.ceil(totalProduct.count / pageSize),
         products: lstProduct,
       }
     }
@@ -192,15 +191,19 @@ const CommonService = {
 
   async getDetailProduct(idProduct, host) {
     const product = await pg('product')
-      .where({ id: idProduct })
+      .where({ 'product.id': idProduct })
       .leftJoin('shop', 'product.id_shop', 'shop.id')
       .select('product.id as id', 'price', 'product.name as nameProduct', 'quantity',
         'shop.name as nameShop', 'address', 'logo')
       .first();
+    if (!product) {
+      throw new Error(MESSAGE.ID_NOK);
+    }
     const imageProduct = await pg('productImage')
       .where({ id_product: idProduct })
       .select('image');
     product.images = imageProduct.map(item => `${host}/public/img/${item.image}`);
+    product.logo = `${host}/public/img/${product.logo}`;
     return {
       code: 0,
       message: MESSAGE.SEARCH_PRODUCT_SUCCESS,
