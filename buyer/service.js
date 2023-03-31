@@ -69,11 +69,11 @@ const BuyerService = {
       throw new Error(MESSAGE.NOT_ACCEPT_CHANGE_STATUS_ORDER);
     }
 
-    const updateOrder = await ques.update({ status }).returing('*').first();
+    const updateOrder = await ques.update({ status }).returning('*');
     return {
       code: 0,
       message: MESSAGE.EDIT_ORDER_SUCCESS,
-      payload: updateOrder,
+      payload: updateOrder[0],
     }
   },
 
@@ -81,8 +81,9 @@ const BuyerService = {
     const { idProduct, idOrder, content, star, idUser } = body;
     const checkOwnOrder = await pg.from('order')
       .where({
-        id: idOrder,
+        'order.id': idOrder,
         id_buyer: idUser,
+        status: 'done',
       })
       .join('orderDetail', 'orderDetail.id_order', 'order.id')
       .where('orderDetail.id_product', idProduct).first();
@@ -110,13 +111,42 @@ const BuyerService = {
     if (star) {
       fixBody.star = star;
     }
-    const newComment = await pg.from('comment').insert(fixBody).returing('*').first();
+    const newComment = await pg.from('comment').insert(fixBody).returning('*');
     return {
       code: 0,
       message: MESSAGE.COMMENT_SUCCESS,
-      payload: newComment,
+      payload: newComment[0],
     }
 
+  },
+
+  async getListComment(query) {
+    let { pageIndex, pageSize, idUser } = query;
+    pageIndex = +pageIndex || PAGINATION.INDEX;
+    pageSize = +pageSize || PAGINATION.SIZE;
+    const ques = pg.from('comment')
+      .join('order', 'order.id', 'comment.id_order')
+      .join('product', 'product.id', 'order.id_product')
+      .where('order.id_buyer', idUser);
+    const totalComment = await ques.clone().count('*').first();
+    const listComment = await ques.limit(pageSize).offset((pageIndex - 1) * pageSize)
+      .select({
+        id: 'comment.id',
+        content: 'comment.content',
+        star: 'comment.star',
+        id_order: 'comment.id_order',
+        name: 'product.name',
+      });
+    return {
+      code: 0,
+      message: MESSAGE.GET_LIST_COMMENT_SUCCESS,
+      payload: {
+        totalPage: Math.ceil(+totalComment.count / pageSize),
+        pageIndex,
+        pageSize,
+        comments: listComment,
+      }
+    }
   },
 
   async getListOrder(query) {
@@ -143,6 +173,7 @@ const BuyerService = {
         }
         return init;
       }, []);
+      return lio;
     });
     return {
       code: 0,
@@ -186,6 +217,35 @@ const BuyerService = {
       payload: order,
     }
   },
+
+  async detailComment(query) {
+    const { idComment, idUser } = query;
+    const comment = await pg.from('comment')
+      .join('order', 'order.id', 'comment.id_order')
+      .join('orderDetail', 'orderDetail.id_order', 'order.id')
+      .join('product', 'product.id', 'orderDetail.id_product')
+      .where({
+        'comment.id': idComment,
+        'order.id_buyer': idUser,
+      })
+      .select({
+        id: 'comment.id',
+        content: 'comment.content',
+        star: 'content.star',
+        name: 'product.name',
+        id_order: 'order.id',
+      })
+      .first();
+    if (!comment) {
+      throw new Error(MESSAGE.ID_NOK);
+    }
+    return {
+      code: 0,
+      message: MESSAGE.GET_DETAIL_COMMENT_SUCCESS,
+      payload: comment,
+    }
+
+  }
 }
 
 module.exports = BuyerService;

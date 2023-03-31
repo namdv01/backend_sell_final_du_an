@@ -80,6 +80,7 @@ const MESSAGE = {
   NOT_ACCEPT_COMMENT: 'Đã tồn tại bình luận về đơn hàng và sản phẩm',
   COMMENT_SUCCESS: 'Bình luận thành công',
   GET_DETAIL_ORDER_SUCCESS: 'Lấy chi tiết đơn hàng thành công',
+  GET_DETAIL_COMMENT_SUCCESS: 'Lấy chi tiết comment thành công',
   NOT_UPDATE_ACCEPT: 'Thay đổi không hợp lệ',
 }
 

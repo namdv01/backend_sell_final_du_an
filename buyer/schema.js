@@ -46,6 +46,9 @@ const editOrderSchema = {
     properties: {
       idOrder: {
         ...baseSchema.id,
+        errorMessage: {
+          _: MESSAGE.ID_NOK
+        }
       },
       status: {
         ...baseSchema.statusOrder,
@@ -72,9 +75,15 @@ const commentSchema = {
     properties: {
       idProduct: {
         ...baseSchema.id,
+        errorMessage: {
+          _: MESSAGE.ID_NOK
+        }
       },
       idOrder: {
         ...baseSchema.id,
+        errorMessage: {
+          _: MESSAGE.ID_NOK
+        }
       },
       content: {
         ...baseSchema.content,
@@ -95,6 +104,44 @@ const commentSchema = {
         idProduct: MESSAGE.ID_PRODUCT_REQUIRED,
         idOrder: MESSAGE.ID_ORDER_REQUIRED,
         content: MESSAGE.CONTENT_ORDER_REQUIRED,
+      }
+    }
+  }
+}
+
+const getListCommentSchema = {
+  response: baseSchema.response,
+  query: {
+    additionalProperties: false,
+    type: 'object',
+    properties: {
+      pageIndex: {
+        ...baseSchema.page,
+        errorMessage: {
+          _: MESSAGE.PAGE_NOK
+        }
+      },
+      pageSize: {
+        ...baseSchema.size,
+        errorMessage: {
+          _: MESSAGE.SIZE_NOK
+        }
+      }
+    }
+  }
+}
+
+const detailCommentSchema = {
+  response: baseSchema.response,
+  params: {
+    additionalProperties: false,
+    type: 'object',
+    properties: {
+      id: {
+        ...baseSchema.id,
+        errorMessage: {
+          _: MESSAGE.ID_NOK
+        }
       }
     }
   }
@@ -130,6 +177,9 @@ const detailOrderSchema = {
     properties: {
       id: {
         ...baseSchema.id,
+        errorMessage: {
+          _: MESSAGE.ID_NOK
+        }
       }
     }
   }
@@ -139,6 +189,8 @@ module.exports = {
   orderSchema,
   editOrderSchema,
   commentSchema,
+  getListCommentSchema,
   getListOrderSchema,
   detailOrderSchema,
+  detailCommentSchema,
 }
