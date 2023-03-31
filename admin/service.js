@@ -44,7 +44,7 @@ const AdminService = {
   },
 
   async getListShop(query) {
-    const { id, idUser, pageIndex, pageSize, host } = query;
+    let { id, idUser, pageIndex, pageSize, host } = query;
     const ques = pg('shop');
     let lstShop;
     if (id) {
@@ -80,7 +80,7 @@ const AdminService = {
   },
 
   async getListProduct(query) {
-    const { id, idShop, pageIndex, pageSize } = query;
+    let { id, idShop, pageIndex, pageSize } = query;
     const ques = pg('product');
     let lstProduct;
     let lstImage;

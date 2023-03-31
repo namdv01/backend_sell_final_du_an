@@ -31,7 +31,12 @@ async function delProductHandler(req, rep) {
 };
 
 async function getProductHandler(req, rep) {
-  const response = await SellerService.getProduct(req.user.id, req.params.id);
+  const query = {
+    host: req.headers.host,
+    idUser: req.user.id,
+    idProduct: req.params.id,
+  }
+  const response = await SellerService.getProduct(query);
   return rep.send(response);
 };
 
@@ -39,8 +44,10 @@ async function getListProductHandler(req, rep) {
   const query = {
     idShop: req.params.idShop,
     ...req.query,
+    idUser: req.user.id,
+    host: req.headers.host,
   }
-  const response = await SellerService.getListProduct(req.user.id, query);
+  const response = await SellerService.getListProduct(query);
   return rep.send(response);
 };
 
@@ -66,7 +73,7 @@ async function getOrderHandler(req, rep) {
 async function getListOrderHandler(req, rep) {
   const query = {
     ...req.query,
-    idUder: req.user.id,
+    idUser: req.user.id,
     idShop: req.params.idShop
   }
   const response = await SellerService.getListOrder(query);
@@ -111,20 +118,20 @@ async function getListShopHandler(req, rep) {
 
 module.exports = async (fastify) => {
 
-  fastify.post('/create-product', { schema: createProduct, preValidation: [fastify.auth, fastify.auth_seller] }, createProductHandler);
-  fastify.put('/edit-product/:id', { schema: editProduct, preValidation: [fastify.auth, fastify.auth_seller] }, editProductHandler);
+  fastify.post('/create-product', { schema: createProduct, preValidation: [fastify.auth, fastify.auth_seller] }, createProductHandler); // done
+  fastify.put('/edit-product/:id', { schema: editProduct, preValidation: [fastify.auth, fastify.auth_seller] }, editProductHandler);  // done
   fastify.delete('/del-product/:id', { schema: delProduct, preValidation: [fastify.auth, fastify.auth_seller] }, delProductHandler);
-  fastify.get('/get-product/:id', { schema: getProduct, preValidation: [fastify.auth, fastify.auth_seller] }, getProductHandler);
-  fastify.get('/get-list-product/:idShop', { schema: getListProduct, preValidation: [fastify.auth, fastify.auth_seller] }, getListProductHandler);
+  fastify.get('/get-product/:id', { schema: getProduct, preValidation: [fastify.auth, fastify.auth_seller] }, getProductHandler); // done
+  fastify.get('/get-list-product/:idShop', { schema: getListProduct, preValidation: [fastify.auth, fastify.auth_seller] }, getListProductHandler);  // done
 
   fastify.put('/edit-order/:id', { schema: editOrder, preValidation: [fastify.auth, fastify.auth_seller] }, editOrderHandler);
-  fastify.get('/get-order/:id', { schema: getOrder, preValidation: [fastify.auth, fastify.auth_seller] }, getOrderHandler);
-  fastify.get('/get-list-order/:idShop', { schema: getListOrder, preValidation: [fastify.auth, fastify.auth_seller] }, getListOrderHandler);
+  fastify.get('/get-order/:id', { schema: getOrder, preValidation: [fastify.auth, fastify.auth_seller] }, getOrderHandler); // done
+  fastify.get('/get-list-order/:idShop', { schema: getListOrder, preValidation: [fastify.auth, fastify.auth_seller] }, getListOrderHandler);  // done
 
-  fastify.post('/create-shop', { schema: createShop, preValidation: [fastify.auth, fastify.auth_seller] }, createShopHandler);
+  fastify.post('/create-shop', { schema: createShop, preValidation: [fastify.auth, fastify.auth_seller] }, createShopHandler);  //done
   fastify.put('/edit-shop/:id', { schema: editShop, preValidation: [fastify.auth, fastify.auth_seller] }, editShopHandler);
   fastify.delete('/del-shop/:id', { schema: delShop, preValidation: [fastify.auth, fastify.auth_seller] }, delShopHandler);
-  fastify.get('/get-list-shop', { schema: getListShop, preValidation: [fastify.auth, fastify.auth_seller] }, getListShopHandler);
+  fastify.get('/get-list-shop', { schema: getListShop, preValidation: [fastify.auth, fastify.auth_seller] }, getListShopHandler); // done
 
   fastify.setErrorHandler((error, req, rep) => {
     return rep.code(200).send({ code: -1, message: error.message });

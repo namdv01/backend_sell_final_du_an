@@ -107,9 +107,9 @@ async function delProductHandler(req, rep) {
 module.exports = async (fastify) => {
   fastify.post('/register', { schema: register }, registerHandler);
 
-  fastify.get('/get-user', { schema: getListUserSchema, preValidation: [fastify.auth, fastify.auth_admin] }, getListUserHandler);
-  fastify.get('/get-shop', { schema: getListShopSchema, preValidation: [fastify.auth, fastify.auth_admin] }, getListShopHandler);
-  fastify.get('/get-order', { schema: getListOrderSchema, preValidation: [fastify.auth, fastify.auth_admin] }, getListOrderHandler);
+  fastify.get('/get-user', { schema: getListUserSchema, preValidation: [fastify.auth, fastify.auth_admin] }, getListUserHandler); // done
+  fastify.get('/get-shop', { schema: getListShopSchema, preValidation: [fastify.auth, fastify.auth_admin] }, getListShopHandler); // done
+  fastify.get('/get-order', { schema: getListOrderSchema, preValidation: [fastify.auth, fastify.auth_admin] }, getListOrderHandler);  // done
   fastify.get('/get-comment', { schema: getListCommentSchema, preValidation: [fastify.auth, fastify.auth_admin] }, getListCommentHandler);
 
   fastify.put('/edit-user/:id', { schema: editUserSchema, preValidation: [fastify.auth, fastify.auth_admin] }, editUserHandler);

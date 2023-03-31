@@ -176,7 +176,7 @@ const getOrder = {
   params: {
     additionalProperties: false,
     properties: {
-      idShop: {
+      id: {
         ...baseSchema.id,
       }
     }
