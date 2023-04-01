@@ -244,8 +244,76 @@ const BuyerService = {
       message: MESSAGE.GET_DETAIL_COMMENT_SUCCESS,
       payload: comment,
     }
+  },
 
+  async editCart(body) {
+    let { host, idUser, detail } = body;
+    // check detail hợp lệ ko trùng lặp
+    detail.sort((d1, d2) => {
+      if (d1.idProduct === d2.idProduct) {
+        throw new Error(MESSAGE.PRODUCTS_IN_CART);
+      }
+      return d1.idProduct - d2.idProduct;
+    })
+    const listIdProduct = detail.map((d) => d.idProduct);
+    const ques = pg.from('cart').where('id_user', idUser);
+
+    let cart = await ques.clone();
+    const product = await pg.from('product').whereIn('id', listIdProduct);
+    await pg.transaction(async (trx) => {
+      // xóa giỏ cũ ghi đè giỏ mới
+      await ques.clone().del().transacting(trx);
+
+      //check số lượng trong giỏ vượt quá số lượng có của 1 product
+      detail.forEach((d) => {
+        const p = product.find((p) => p.id === d.idProduct);
+        if (p.quantity < d.quantity) {
+          throw new Error(MESSAGE.PRODUCTS_IN_CART);
+        }
+      });
+
+      detail = detail.map((d) => {
+        return {
+          id: v4(),
+          id_user: idUser,
+          id_product: d.idProduct,
+          quantity: d.quantity,
+        }
+      })
+
+      cart = await pg.from('cart').insert(detail).returning('*').transacting(trx);
+    });
+    return {
+      code: 0,
+      message: MESSAGE.EDIT_CART_SUCCESS,
+      payload: cart,
+    }
+  },
+
+  async getCart(query) {
+    const { idUser, host } = query;
+    let cart = await pg.from('cart').where('id_user', idUser)
+      .join('product', 'product.id', 'cart.id_product')
+      .select({
+        id: 'cart.id',
+        id_product: 'product.id',
+        quantity: 'cart.quantity',
+        name: 'product.name',
+      });
+    const listIdProduct = cart.map((item) => item.id_product);
+    const productImage = await pg.from('productImage').whereIn('id_product', listIdProduct);
+    cart = cart.map((c) => {
+      const i = productImage.find((pI) => pI.id_product = c.id_product);
+      c.image = `${host}/tmp/img/${i.image}`;
+      return c;
+    });
+    return {
+      code: 0,
+      message: MESSAGE.GET_CART_SUCCESS,
+      payload: cart,
+    }
   }
 }
+
 
 module.exports = BuyerService;

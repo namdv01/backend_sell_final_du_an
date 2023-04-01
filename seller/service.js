@@ -51,7 +51,7 @@ const SellerService = {
         quantity,
         price,
         id_shop,
-        images: publicProduct.map((pI) => `${host}/public/img/${pI}`),
+        images: publicProduct.map((pI) => `${host}/tmp/img/${pI}`),
       }
     }
   },
@@ -115,7 +115,7 @@ const SellerService = {
     });
     // lấy toàn bộ ảnh sản phẩm hiện tại
     const curImage = await pg.from('productImage').where('id_product', id_product).select('image');
-    newProduct[0].images = curImage.map((i) => `${host}/public/img/${i.image}`);
+    newProduct[0].images = curImage.map((i) => `${host}/tmp/img/${i.image}`);
     return {
       code: 0,
       message: MESSAGE.EDIT_PRODUCT_SUCCESS,
@@ -162,8 +162,8 @@ const SellerService = {
     }
     const productImage = await pg.from('productImage').where('id_product', idProduct)
       .select('image');
-    product.logo = `${host}/public/img/${product.logo}`;
-    product.images = productImage.map((i) => `${host}/public/img/${i.image}`);
+    product.logo = `${host}/tmp/img/${product.logo}`;
+    product.images = productImage.map((i) => `${host}/tmp/img/${i.image}`);
     return {
       code: 0,
       message: MESSAGE.SEARCH_PRODUCT_SUCCESS,
@@ -197,7 +197,7 @@ const SellerService = {
     listProduct = listProduct.map((pro) => {
       pro.images = listImageProduct.reduce((init, ima) => {
         if (ima.id_product === pro.id) {
-          init.push(`${host}/public/img/${ima.image}`);
+          init.push(`${host}/tmp/img/${ima.image}`);
         }
         return init;
       }, []);
@@ -248,7 +248,7 @@ const SellerService = {
       message: MESSAGE.CREATE_SHOP_SUCCESS,
       payload: {
         ...saveShop,
-        logo: `${host}/public/img/${saveShop.logo}`,
+        logo: `${host}/tmp/img/${saveShop.logo}`,
       }
     }
   },
@@ -276,7 +276,7 @@ const SellerService = {
       imageService.deleteImage(shop.logo);
     }
     const newShop = await ques.update(rest).returning('*');
-    newShop.logo = `${host}/public/img/${newLogo || shop.logo}`;
+    newShop.logo = `${host}/tmp/img/${newLogo || shop.logo}`;
     return {
       code: 0,
       message: MESSAGE.EDIT_SHOP_SUCCESS,
@@ -319,7 +319,7 @@ const SellerService = {
     const shop = await ques.limit(pageSize).offset((pageIndex - 1) * pageSize);
     const fixShop = shop.map((i) => ({
       ...i,
-      logo: `${host}/public/img/${i.logo}`,
+      logo: `${host}/tmp/img/${i.logo}`,
     }));
     return {
       code: 0,

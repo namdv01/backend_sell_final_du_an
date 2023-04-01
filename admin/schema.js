@@ -200,6 +200,12 @@ const editUserSchema = {
         errorMessage: {
           _: MESSAGE.PASSWORD_INVALID
         }
+      },
+      phone: {
+        ...baseSchema.phone,
+        errorMessage: {
+          _: MESSAGE.PHONE_INVALID,
+        }
       }
     }
   }

@@ -15,7 +15,7 @@ const AdminService = {
       if (!lstUser) {
         throw new Error(MESSAGE.ID_NOK);
       }
-      lstUser.avatar = `${host}/public/img/${lstUser.avatar}`;
+      lstUser.avatar = `${host}/tmp/img/${lstUser.avatar}`;
       return {
         code: 0,
         message: MESSAGE.GET_LIST_USER_SUCCESS,
@@ -30,7 +30,7 @@ const AdminService = {
     const totalUser = await ques.clone().count('*').first();
     lstUser = await ques.limit(pageSize).offset((pageIndex - 1) * pageSize)
       .select('id', 'email', 'fullname', 'phone', 'avatar', 'gender', 'role', 'numberShop');
-    lstUser = lstUser.map((u) => ({ ...u, avatar: `${host}/public/img/${u.avatar}` }));
+    lstUser = lstUser.map((u) => ({ ...u, avatar: `${host}/tmp/img/${u.avatar}` }));
     return {
       code: 0,
       message: MESSAGE.GET_LIST_USER_SUCCESS,
@@ -52,7 +52,7 @@ const AdminService = {
       if (!lstShop) {
         throw new Error(MESSAGE.ID_NOK);
       }
-      lstShop.logo = `${host}/public/img/${lstShop.logo}`;
+      lstShop.logo = `${host}/tmp/img/${lstShop.logo}`;
       return {
         code: 0,
         message: MESSAGE.GET_LIST_SHOP_SUCCESS,
@@ -66,7 +66,7 @@ const AdminService = {
     pageSize = +pageSize || PAGINATION.SIZE;
     pageIndex = +pageIndex || PAGINATION.INDEX;
     lstShop = await ques.limit(pageSize).offset((pageIndex - 1) * pageSize);
-    lstShop = lstShop.map((shop) => ({ ...shop, logo: `${host}/public/img/${shop.logo}` }));
+    lstShop = lstShop.map((shop) => ({ ...shop, logo: `${host}/tmp/img/${shop.logo}` }));
     return {
       code: 0,
       message: MESSAGE.GET_LIST_PRODUCT_SUCCESS,
@@ -90,7 +90,7 @@ const AdminService = {
         throw new Error(MESSAGE.ID_NOK);
       }
       lstImage = await pg.from('productImage').where({ id_product: id }).select('image');
-      lstImage = lstImage.map((image) => `${host}/public/img/${image.image}`);
+      lstImage = lstImage.map((image) => `${host}/tmp/img/${image.image}`);
       lstProduct.images = lstImage;
       return {
         code: 0,
@@ -247,7 +247,7 @@ const AdminService = {
   },
 
   async editUser(body) {
-    const { fullname, gender, avatar, numberShop, password, host, idUser } = body;
+    const { fullname, gender, avatar, numberShop, password, host, idUser, phone } = body;
     const ques = pg.from('user').where({ id: idUser });
     const checkAdmin = await ques.clone().first();
     if (checkAdmin.role === 'admin') {
@@ -259,6 +259,9 @@ const AdminService = {
     }
     if (gender) {
       formUpdate.gender = gender;
+    }
+    if (phone) {
+      formUpdate.phone = phone;
     }
     if (numberShop) {
       if (checkAdmin.role !== 'seller') {
@@ -278,7 +281,7 @@ const AdminService = {
     }
     const updateUser = await ques.update(formUpdate).returing('*').first();
     const { password: newPassword, ...rest } = updateUser;
-    rest.avatar = `${host}/public/img/${rest.avatar}`;
+    rest.avatar = `${host}/tmp/img/${rest.avatar}`;
     return {
       code: 0,
       message: MESSAGE.UPDATE_PROFILE_SUCCESS,
@@ -308,7 +311,7 @@ const AdminService = {
       imageService.deleteImage(checkShop.logo);
     }
     const updateShop = await ques.update(formUpdate).returing('*').first();
-    updateShop.logo = `${host}/public/img/${updateShop.logo}`;
+    updateShop.logo = `${host}/tmp/img/${updateShop.logo}`;
     return {
       code: 0,
       message: MESSAGE.EDIT_SHOP_SUCCESS,
@@ -400,7 +403,7 @@ const AdminService = {
     });
     // lấy toàn bộ ảnh sản phẩm hiện tại
     const curImage = await pg.from('productImage').where('id_product', idProduct).select('image');
-    newProduct[0].images = curImage.map((i) => `${host}/public/img/${i.image}`);
+    newProduct[0].images = curImage.map((i) => `${host}/tmp/img/${i.image}`);
     return {
       code: 0,
       message: MESSAGE.EDIT_PRODUCT_SUCCESS,
@@ -436,7 +439,7 @@ const AdminService = {
       message: MESSAGE.CREATE_SHOP_SUCCESS,
       payload: {
         ...saveShop,
-        logo: `${host}/public/img/${saveShop.logo}`,
+        logo: `${host}/tmp/img/${saveShop.logo}`,
       }
     }
   },
@@ -488,7 +491,7 @@ const AdminService = {
         price,
         idShop,
         idUser,
-        images: publicProduct.map((pI) => `${host}/public/img/${pI}`),
+        images: publicProduct.map((pI) => `${host}/tmp/img/${pI}`),
       }
     }
   },

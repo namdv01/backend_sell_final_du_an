@@ -42,8 +42,8 @@ module.exports = async function (fastify, opts) {
   })
 
   fastify.register(require('@fastify/static'), {
-    root: path.join(__dirname, 'public'),
-    prefix: '/public/', // optional: default '/'
+    root: path.join(__dirname, 'tmp'),
+    prefix: '/tmp/', // optional: default '/'
   })
 
   fastify.decorate('auth', async (req, rep) => {

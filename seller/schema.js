@@ -72,9 +72,6 @@ const editProduct = {
           _: MESSAGE.PRICE_NOK
         }
       },
-      idShop: {
-        ...baseSchema.id
-      },
       imagesAdd: {
         type: 'array',
         items: {
@@ -123,8 +120,21 @@ const getProduct = {
 
 const getListProduct = {
   response: baseSchema.response,
+  params: {
+    additionalProperties: false,
+    type: 'object',
+    properties: {
+      idShop: {
+        ...baseSchema.id,
+        errorMessage: {
+          _: MESSAGE.ID_NOK,
+        }
+      }
+    }
+  },
   query: {
     additionalProperties: false,
+    type: 'object',
     properties: {
       pageIndex: {
         ...baseSchema.page,

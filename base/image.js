@@ -36,12 +36,12 @@ const image = {
     const buff = Buffer.from(binaryUrl.split('base64,')[1], 'base64');
     const filename = `${v4() + Date.now()}.jpg`;
     const foldername = `${folder}/${filename}`;
-    fs.writeFileSync(`./public/img/${foldername}`, buff);
+    fs.writeFileSync(`./tmp/img/${foldername}`, buff);
     return foldername;
   },
 
   deleteImage: (path) => {
-    const fullPath = `./public/img/${path}`;
+    const fullPath = `./tmp/img/${path}`;
     if (fs.existsSync(fullPath)) {
       fs.unlinkSync(fullPath);
       return true;

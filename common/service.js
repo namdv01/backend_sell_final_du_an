@@ -61,7 +61,7 @@ const CommonService = {
       throw new Error(MESSAGE.INFORMATION_INVALID);
     }
     delete user.password;
-    user.avatar = `${host}/public/img/${user.avatar}`;
+    user.avatar = `${host}/tmp/img/${user.avatar}`;
     const token = jwt.sign({
       id: user.id,
       role: user.role,
@@ -72,7 +72,6 @@ const CommonService = {
       payload: {
         user,
         token,
-        host
       }
     }
   },
@@ -112,7 +111,7 @@ const CommonService = {
       await query.update(formUpdate);
       imageService.deleteImage(user.avatar);
       // await cloudinary.uploader.destroy(public_id);
-      formUpdate.avatar = `${host}/public/img/${formUpdate.avatar}`;
+      formUpdate.avatar = `${host}/tmp/img/${formUpdate.avatar}`;
       return {
         code: 0,
         message: MESSAGE.UPDATE_PROFILE_SUCCESS,
@@ -123,7 +122,7 @@ const CommonService = {
     }
     const updateUser = await query.update(formUpdate).returning('*');
     delete updateUser[0].password;
-    updateUser[0].avatar = `${host}/public/img/${updateUser[0].avatar}`;
+    updateUser[0].avatar = `${host}/tmp/img/${updateUser[0].avatar}`;
     return {
       code: 0,
       message: MESSAGE.UPDATE_PROFILE_SUCCESS,
@@ -172,7 +171,7 @@ const CommonService = {
     for (let i = 0; i < lstProduct.length; i++) {
       lstProduct[i].images = lstImageProduct.reduce((init, item) => {
         if (item.id_product === lstIdProduct[i]) {
-          init.push(`${host}/public/img/${item.image}`);
+          init.push(`${host}/tmp/img/${item.image}`);
         }
         return init;
       }, []);
@@ -202,8 +201,8 @@ const CommonService = {
     const imageProduct = await pg('productImage')
       .where({ id_product: idProduct })
       .select('image');
-    product.images = imageProduct.map(item => `${host}/public/img/${item.image}`);
-    product.logo = `${host}/public/img/${product.logo}`;
+    product.images = imageProduct.map(item => `${host}/tmp/img/${item.image}`);
+    product.logo = `${host}/tmp/img/${product.logo}`;
     return {
       code: 0,
       message: MESSAGE.SEARCH_PRODUCT_SUCCESS,

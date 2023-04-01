@@ -1,6 +1,7 @@
 const BuyerService = require('./service');
 const { orderSchema, editOrderSchema, commentSchema, getListOrderSchema,
-  detailOrderSchema, getListCommentSchema, detailCommentSchema, } = require('./schema');
+  detailOrderSchema, getListCommentSchema, detailCommentSchema,
+  editCartSchema, getCartSchema } = require('./schema');
 
 async function orderHandler(req, rep) {
   const body = {
@@ -65,6 +66,25 @@ async function detailCommentHandler(req, rep) {
   return rep.send(response);
 }
 
+async function editCartHandler(req, rep) {
+  const body = {
+    host: req.headers.host,
+    idUser: req.user.id,
+    ...req.body,
+  }
+  const response = await BuyerService.editCart(body);
+  return rep.send(response);
+}
+
+async function getCartHandler(req, rep) {
+  const query = {
+    host: req.headers.host,
+    idUser: req.user.id,
+  }
+  const response = await BuyerService.getCart(query);
+  return rep.send(response);
+}
+
 module.exports = async (fastify) => {
   fastify.post('/order', { schema: orderSchema, preValidation: [fastify.auth, fastify.auth_buyer] }, orderHandler); // done
   fastify.put('/edit-order', { schema: editOrderSchema, preValidation: [fastify.auth, fastify.auth_buyer] }, editOrderHandler); // done
@@ -73,6 +93,8 @@ module.exports = async (fastify) => {
   fastify.get('/detail-comment/:id', { schema: detailCommentSchema, preValidation: [fastify.auth, fastify.auth_buyer] }, detailCommentHandler); // done
   fastify.get('/get-list-order', { schema: getListOrderSchema, preValidation: [fastify.auth, fastify.auth_buyer] }, getListOrderHandler); // done
   fastify.get('/detail-order/:id', { schema: detailOrderSchema, preValidation: [fastify.auth, fastify.auth_buyer] }, detailOrderHandler); // done
+  fastify.put('/edit-cart', { schema: editCartSchema, preValidation: [fastify.auth, fastify.auth_buyer] }, editCartHandler);
+  fastify.get('/get-cart', { schema: getCartSchema, preValidation: [fastify.auth, fastify.auth_buyer] }, getCartHandler);
 
   fastify.setErrorHandler((error, req, rep) => {
     return rep.code(200).send({ code: -1, message: error.message });

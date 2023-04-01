@@ -185,6 +185,40 @@ const detailOrderSchema = {
   }
 }
 
+const editCartSchema = {
+  response: baseSchema.response,
+  body: {
+    additionalProperties: false,
+    type: 'object',
+    properties: {
+      detail: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            idProduct: {
+              ...baseSchema.id,
+              errorMessage: {
+                _: MESSAGE.ID_NOK,
+              }
+            },
+            quantity: {
+              ...baseSchema.quantity,
+              errorMessage: {
+                _: MESSAGE.QUANTITY_NOK,
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+const getCartSchema = {
+  response: baseSchema.response,
+}
+
 module.exports = {
   orderSchema,
   editOrderSchema,
@@ -193,4 +227,6 @@ module.exports = {
   getListOrderSchema,
   detailOrderSchema,
   detailCommentSchema,
+  editCartSchema,
+  getCartSchema,
 }

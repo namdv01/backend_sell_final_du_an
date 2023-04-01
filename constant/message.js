@@ -30,6 +30,7 @@ const MESSAGE = {
   DEL_PRODUCT_SUCCESS: 'Xóa sản phẩm thành công',
   EDIT_SHOP_SUCCESS: 'Sửa thông tin gian hàng thành công',
   DEL_SHOP_SUCCESS: 'Xóa gian hàng thành công',
+  EDIT_CART_SUCCESS: 'Cập nhật giỏ hàng thành công',
   ORDER_SUCCESS: 'Đặt đơn hàng thành công',
   ORDER_FAIL: 'Đặt đơn hàng thất bại',
   CHANGE_PASSWORD_SUCCESS: 'Đổi mật khẩu thành công',
@@ -82,6 +83,8 @@ const MESSAGE = {
   GET_DETAIL_ORDER_SUCCESS: 'Lấy chi tiết đơn hàng thành công',
   GET_DETAIL_COMMENT_SUCCESS: 'Lấy chi tiết comment thành công',
   NOT_UPDATE_ACCEPT: 'Thay đổi không hợp lệ',
+  GET_CART_SUCCESS: 'Lấy giỏ hàng thành công',
+  PRODUCTS_IN_CART: 'Sản phẩm trong giỏ hàng không hợp lệ',
 }
 
 module.exports = MESSAGE;
