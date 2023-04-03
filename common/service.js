@@ -22,11 +22,11 @@ const CommonService = {
       throw new Error(MESSAGE.AVATAR_INVALID);
     }
 
-    // const save_avatar = await cloudinary.uploader.upload(avatar, {
-    //   folder: '/sale_final/avatar'
-    // });
+    const save_avatar = await cloudinary.uploader.upload(avatar, {
+      folder: '/sale_final/avatar'
+    });
 
-    const publicAvatar = imageService.convertImage(avatar, 'avatar');
+    // const publicAvatar = imageService.convertImage(avatar, 'avatar');
 
     const id = v4();
     const dataSave = {
@@ -37,8 +37,8 @@ const CommonService = {
       phone,
       id,
       role,
-      avatar: publicAvatar,
-      // avatar: save_avatar.secure_url
+      // avatar: publicAvatar,
+      avatar: save_avatar.secure_url
     };
 
     await query.insert(dataSave);
@@ -50,7 +50,7 @@ const CommonService = {
 
   },
 
-  async login(body, { jwt, host }) {
+  async login(body, { jwt }) {
     const { email, password } = body;
     const query = pg.from('user');
     const user = await query.clone().where({ email }).first();
@@ -61,7 +61,6 @@ const CommonService = {
       throw new Error(MESSAGE.INFORMATION_INVALID);
     }
     delete user.password;
-    user.avatar = `${host}/tmp/img/${user.avatar}`;
     const token = jwt.sign({
       id: user.id,
       role: user.role,
@@ -102,16 +101,18 @@ const CommonService = {
       throw new Error(MESSAGE.AVATAR_INVALID);
     }
     if (avatar) {
-      // const save_avatar = await cloudinary.uploader.upload(avatar, {
-      //   folder: '/sale_final/avatar'
-      // });
-      // const public_id = user.avatar.split('/').splice(-1)[0].slice(0, 4);
-      const publicAvatar = imageService.convertImage(avatar, 'avatar');
-      formUpdate.avatar = publicAvatar;
+      const save_avatar = await cloudinary.uploader.upload(avatar, {
+        folder: '/sale_final/avatar'
+      });
+      console.log(save_avatar);
+      const public_id = user.avatar.split('/').splice(-1)[0].slice(0, -4);
+      // const publicAvatar = imageService.convertImage(avatar, 'avatar');
+      formUpdate.avatar = save_avatar.secure_url;
       await query.update(formUpdate);
-      imageService.deleteImage(user.avatar);
-      // await cloudinary.uploader.destroy(public_id);
-      formUpdate.avatar = `${host}/tmp/img/${formUpdate.avatar}`;
+      console.log(public_id);
+      // imageService.deleteImage(user.avatar);
+      await cloudinary.uploader.destroy('sale_final/avatar/' + public_id);
+      formUpdate.avatar = save_avatar.secure_url;
       return {
         code: 0,
         message: MESSAGE.UPDATE_PROFILE_SUCCESS,
@@ -122,7 +123,6 @@ const CommonService = {
     }
     const updateUser = await query.update(formUpdate).returning('*');
     delete updateUser[0].password;
-    updateUser[0].avatar = `${host}/tmp/img/${updateUser[0].avatar}`;
     return {
       code: 0,
       message: MESSAGE.UPDATE_PROFILE_SUCCESS,

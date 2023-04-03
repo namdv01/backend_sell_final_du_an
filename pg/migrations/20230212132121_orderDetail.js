@@ -9,6 +9,7 @@ exports.up = function (knex) {
       table.uuid('id_order').notNullable();
       table.uuid('id_product').notNullable();
       table.integer('quantity').notNullable().defaultTo(1);
+      table.bigInteger('price').notNullable();
     });
 };
 

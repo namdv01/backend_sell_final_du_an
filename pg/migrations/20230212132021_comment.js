@@ -7,7 +7,7 @@ exports.up = function (knex) {
     .createTable('comment', (table) => {
       table.uuid('id').primary();
       table.uuid('id_product').notNullable();
-      table.uuid('id_user').notNullable();
+      table.uuid('id_order').notNullable();
       table.text('content').notNullable();
       table.integer('star').defaultTo(5);
     });

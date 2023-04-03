@@ -10,7 +10,7 @@ exports.up = function (knex) {
       table.string('password', 255).notNullable();
       table.string('fullname', 128).notNullable();
       table.string('phone', 20);
-      table.string('avatar', 255);
+      table.text('avatar').notNullable();
       table.enum('gender', ['male', 'female', 'other']).notNullable();
       table.enum('role', ['admin', 'seller', 'buyer']).notNullable();
       table.integer('numberShop').defaultTo(0);

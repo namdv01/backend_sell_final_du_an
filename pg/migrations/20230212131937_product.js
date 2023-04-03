@@ -7,8 +7,8 @@ exports.up = function (knex) {
     .createTable('product', (table) => {
       table.uuid('id').primary();
       table.string('name', 255).notNullable();
-      table.integer('quantity').notNullable().defaultTo(10);
-      table.integer('price').notNullable().defaultTo(1000000);
+      table.integer('quantity').notNullable();
+      table.bigInteger('price').notNullable();
       table.uuid('id_shop').notNullable();
     });
 };

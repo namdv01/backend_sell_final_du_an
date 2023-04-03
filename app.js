@@ -41,10 +41,10 @@ module.exports = async function (fastify, opts) {
     secret: 'namdv',
   })
 
-  fastify.register(require('@fastify/static'), {
-    root: path.join(__dirname, 'tmp'),
-    prefix: '/tmp/', // optional: default '/'
-  })
+  // fastify.register(require('@fastify/static'), {
+  //   root: path.join(__dirname, 'tmp'),
+  //   prefix: '/tmp/', // optional: default '/'
+  // })
 
   fastify.decorate('auth', async (req, rep) => {
     const token = req.headers.authorization.split(' ')[1];
