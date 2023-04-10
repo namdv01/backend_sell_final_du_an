@@ -104,12 +104,10 @@ const CommonService = {
       const save_avatar = await cloudinary.uploader.upload(avatar, {
         folder: '/sale_final/avatar'
       });
-      console.log(save_avatar);
       const public_id = user.avatar.split('/').splice(-1)[0].slice(0, -4);
       // const publicAvatar = imageService.convertImage(avatar, 'avatar');
       formUpdate.avatar = save_avatar.secure_url;
       await query.update(formUpdate);
-      console.log(public_id);
       // imageService.deleteImage(user.avatar);
       await cloudinary.uploader.destroy('sale_final/avatar/' + public_id);
       formUpdate.avatar = save_avatar.secure_url;

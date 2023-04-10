@@ -2,6 +2,7 @@ const { v4 } = require('uuid');
 const imageService = require('../base/image');
 const { connectPg: pg } = require('../base/connectDb');
 const MESSAGE = require('../constant/message');
+const cloudinary = require('../base/cloudinary');
 
 const SellerService = {
   // product
@@ -232,24 +233,23 @@ const SellerService = {
     if (!imageService.checkType(logo) || imageService.sizeBase64(logo) > 5) {
       throw new Error(MESSAGE.AVATAR_INVALID);
     }
-
-    const publicLogo = imageService.convertImage(logo, 'logo');
+    const save_logo = await cloudinary.uploader.upload(logo, {
+      folder: '/sale_final/logo',
+    })
+    // const publicLogo = imageService.convertImage(logo, 'logo');
     const id = v4();
     const dataSave = {
       name,
       id_user,
       address,
-      logo: publicLogo,
+      logo: save_logo.secure_url,
       id,
     }
-    const saveShop = await pg.from('shop').insert(dataSave).returning('*').first();
+    const saveShop = await pg.from('shop').insert(dataSave).returning('*');
     return {
       code: 0,
       message: MESSAGE.CREATE_SHOP_SUCCESS,
-      payload: {
-        ...saveShop,
-        logo: `${host}/tmp/img/${saveShop.logo}`,
-      }
+      payload: saveShop[0]
     }
   },
 
@@ -271,16 +271,21 @@ const SellerService = {
       if (!imageService.checkType(rest.logo) || imageService.sizeBase64(rest.logo) > 5) {
         throw new Error(MESSAGE.IMAGE_INVALID);
       }
-      newLogo = imageService.convertImage(rest.logo);
-      rest.logo = newLogo;
-      imageService.deleteImage(shop.logo);
+      // newLogo = imageService.convertImage(rest.logo);
+      // rest.logo = newLogo;
+      // imageService.deleteImage(shop.logo);
+      newLogo = await cloudinary.uploader.upload(rest.logo, {
+        folder: '/sale_final/logo',
+      });
+      const public_id = shop.logo.split('/').splice(-1)[0].slice(0, -4);
+      rest.logo = newLogo.secure_url;
+      await cloudinary.uploader.destroy('sale_final/logo/' + public_id);
     }
     const newShop = await ques.update(rest).returning('*');
-    newShop.logo = `${host}/tmp/img/${newLogo || shop.logo}`;
     return {
       code: 0,
       message: MESSAGE.EDIT_SHOP_SUCCESS,
-      payload: newShop,
+      payload: newShop[0],
     }
   },
 
@@ -300,9 +305,15 @@ const SellerService = {
     await pg.transaction(async (trx) => {
       // chỉ xóa sản phẩm ko xóa đơn hàng
       await pg.from('shop').where({ id: idShop }).del().transacting(trx);
+      const public_logo = shop.logo.split('/').splice(-1)[0].slice(0, -4);
+      await cloudinary.uploader.destroy('sale_final/logo/' + public_logo);
       const oldProduct = await pg.from('product').where('id_shop', idShop).del().returning('id').transacting(trx);
       const fixIdProduct = oldProduct.map((pro) => pro.id);
-      await pg.from('productImage').whereIn('id_product', fixIdProduct).transacting(trx);
+      const oldImage = await pg.from('productImage').whereIn('id_product', fixIdProduct).returning('image').transacting(trx);
+      await Promise.all(oldImage.map((item) => {
+        const public_id = item.image.split('/').splice(-1)[0].slice(0, -4);
+        return cloudinary.uploader.destroy('sale_final/product/' + public_id);
+      }))
     });
     return {
       code: 0,
