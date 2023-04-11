@@ -377,21 +377,17 @@ const SellerService = {
   },
 
   async getListShop(query) {
-    let { id_user, host, pageIndex, pageSize } = query;
+    let { id_user, pageIndex, pageSize } = query;
     pageSize = +pageSize || 20;
     pageIndex = +pageIndex || 1;
     const ques = pg.from('shop').where('id_user', id_user);
     const totalShop = await ques.clone().count().first();
     const shop = await ques.limit(pageSize).offset((pageIndex - 1) * pageSize);
-    const fixShop = shop.map((i) => ({
-      ...i,
-      logo: `${host}/tmp/img/${i.logo}`,
-    }));
     return {
       code: 0,
-      message: MESSAGE.SEARCH_PRODUCT_SUCCESS,
+      message: MESSAGE.SEARCH_OWN_SHOP_SUCCESS,
       payload: {
-        shop: fixShop,
+        shop,
         pageIndex,
         pageSize,
         totalPage: Math.ceil(+totalShop.count / pageSize),

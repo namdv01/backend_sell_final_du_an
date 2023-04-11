@@ -85,6 +85,7 @@ const MESSAGE = {
   NOT_UPDATE_ACCEPT: 'Thay đổi không hợp lệ',
   GET_CART_SUCCESS: 'Lấy giỏ hàng thành công',
   PRODUCTS_IN_CART: 'Sản phẩm trong giỏ hàng không hợp lệ',
+  SEARCH_OWN_SHOP_SUCCESS: 'Danh sách gian hàng sở hữu',
 }
 
 module.exports = MESSAGE;
