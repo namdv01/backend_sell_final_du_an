@@ -83,7 +83,7 @@ const SellerService = {
   },
 
   async editProduct(body) {
-    const { id_product, id_user, host, name, quantity, price, imagesAdd, imagesRemove } = body;
+    const { id_product, id_user, name, quantity, price, imagesAdd, imagesRemove } = body;
     const checkOwnProduct = await pg.from('product')
       .where('product.id', id_product)
       .join('shop', 'product.id_shop', 'shop.id')
@@ -107,45 +107,72 @@ const SellerService = {
     if (price) {
       formUpdate.price = price;
     }
-    let publicProduct = [];
+    let publicImageProduct = [];
     let newProduct = {};
-    await pg.transaction(async (trx) => {
-      newProduct = await pg.from('product').where('product.id', id_product)
-        .update(formUpdate).returning('*').first().transacting(trx);
+    const trx = await pg.transaction();
+    newProduct = await trx('product').update(formUpdate).where('product.id', id_product).returning('*');
+    if (imagesAdd && imagesAdd.length > 0) {
+      imagesAdd.forEach(i => {
+        if (!imageService.checkType(i) || imageService.sizeBase64(i) > 5) {
+          throw new Error(MESSAGE.IMAGE_INVALID);
+        }
+      });
+      const uploadImage = imagesAdd.map((i) => cloudinary.uploader.upload(i, {
+        folder: '/sale_final/product/'
+      }));
+      publicImageProduct = await Promise.all(uploadImage);
+      await trx('productImage').insert(publicImageProduct.map((pIP) => ({
+        id: v4(),
+        image: pIP.secure_url,
+        id_product: id_product
+      })));
+    }
+    if (imagesRemove && imagesRemove.length > 0) {
+      await trx('productImage').del().whereIn('image', imagesRemove).andWhere('id_product', id_product);
+      const delImage = imagesRemove.map((i) => {
+        const public_id = i.split('/').splice(-1)[0].slice(0, -4);
+        return cloudinary.uploader.destroy('sale_final/product/' + public_id);
+      });
+      await Promise.all(delImage);
+    }
+    await trx.commit();
+    
+    // await pg.transaction(async (trx) => {
+    //   newProduct = await pg.from('product').where('product.id', id_product)
+    //     .update(formUpdate).returning('*').first().transacting(trx);
 
-      if (imagesAdd && imagesAdd.length > 0) {
-        imagesAdd.forEach(async (image) => {
-          if (!imageService.checkType(image) || imageService.sizeBase64(image) > 5) {
-            throw new Error(MESSAGE.IMAGE_INVALID);
-          }
-        });
-        publicProduct = imagesAdd.map((image) => {
-          return imageService.convertImage(image, 'product');
-        });
+    //   if (imagesAdd && imagesAdd.length > 0) {
+    //     imagesAdd.forEach(async (image) => {
+    //       if (!imageService.checkType(image) || imageService.sizeBase64(image) > 5) {
+    //         throw new Error(MESSAGE.IMAGE_INVALID);
+    //       }
+    //     });
+    //     publicProduct = imagesAdd.map((image) => {
+    //       return imageService.convertImage(image, 'product');
+    //     });
 
 
-        await pg.from('productImage').insert(publicProduct.map((pI) => ({
-          id: v4(),
-          id_product: newProduct[0].id,
-          image: pI,
-        }))).transacting(trx);
-      }
+    //     await pg.from('productImage').insert(publicProduct.map((pI) => ({
+    //       id: v4(),
+    //       id_product: newProduct[0].id,
+    //       image: pI,
+    //     }))).transacting(trx);
+    //   }
 
-      if (imagesRemove && imagesRemove.length > 0) {
-        const fixList = imagesRemove.map((image) => image.split('public/img/')[1]);
-        await pg.from('productImage').del().whereIn('image', fixList).transacting(trx);
-        fixList.forEach((image) => {
-          imageService.deleteImage(image);
-        });
-      }
-    });
-    // lấy toàn bộ ảnh sản phẩm hiện tại
-    const curImage = await pg.from('productImage').where('id_product', id_product).select('image');
-    newProduct[0].images = curImage.map((i) => `${host}/tmp/img/${i.image}`);
+    //   if (imagesRemove && imagesRemove.length > 0) {
+    //     const fixList = imagesRemove.map((image) => image.split('public/img/')[1]);
+    //     await pg.from('productImage').del().whereIn('image', fixList).transacting(trx);
+    //     fixList.forEach((image) => {
+    //       imageService.deleteImage(image);
+    //     });
+    //   }
+    // });
+    // // lấy toàn bộ ảnh sản phẩm hiện tại
+    // const curImage = await pg.from('productImage').where('id_product', id_product).select('image');
+    // newProduct[0].images = curImage.map((i) => `${host}/tmp/img/${i.image}`);
     return {
       code: 0,
       message: MESSAGE.EDIT_PRODUCT_SUCCESS,
-      payload: newProduct,
     }
 
   },
