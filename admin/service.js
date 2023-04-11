@@ -3,6 +3,7 @@ const { PAGINATION } = require('../constant');
 const MESSAGE = require('../constant/message');
 const passwordService = require('../base/password');
 const imageService = require('../base/image');
+const cloudinary = require('../base/cloudinary');
 
 const AdminService = {
   async getListUser(query) {
@@ -243,7 +244,7 @@ const AdminService = {
   },
 
   async editUser(body) {
-    const { fullname, gender, avatar, numberShop, password, host, idUser, phone } = body;
+    const { fullname, gender, avatar, numberShop, password, idUser, phone } = body;
     const ques = pg.from('user').where({ id: idUser });
     const checkAdmin = await ques.clone().first();
     if (checkAdmin.role === 'admin') {
@@ -272,12 +273,19 @@ const AdminService = {
       if (!imageService.checkType(avatar) || imageService.sizeBase64(avatar) > 5) {
         throw new Error(MESSAGE.AVATAR_INVALID);
       }
-      formUpdate.avatar = imageService.convertImage(avatar, 'avatar');
-      imageService.deleteImage(checkAdmin.avatar);
+      const imageAvatar = await cloudinary.uploader.upload(avatar, {
+        folder: '/sale_final/avatar'
+      });
+      formUpdate.avatar = imageAvatar.secure_url;
+      // formUpdate.avatar = imageService.convertImage(avatar, 'avatar');
+      // imageService.deleteImage(checkAdmin.avatar);
     }
-    const updateUser = await ques.update(formUpdate).returing('*').first();
-    const { password: newPassword, ...rest } = updateUser;
-    rest.avatar = `${host}/tmp/img/${rest.avatar}`;
+    const updateUser = await ques.update(formUpdate).returning('*');
+    if(avatar) {
+      const public_id = checkAdmin.split('/').splice(-1)[0].slice(0, -4);
+      await cloudinary.uploader.destroy('sale_final/product/' + public_id);
+    }
+    const { password: newPassword, ...rest } = updateUser[0];
     return {
       code: 0,
       message: MESSAGE.UPDATE_PROFILE_SUCCESS,
@@ -286,7 +294,7 @@ const AdminService = {
   },
 
   async editShop(body) {
-    const { idShop, name, logo, address, host } = body;
+    const { idShop, name, logo, address } = body;
     const ques = pg.from('shop').where({ id: idShop });
     const checkShop = await ques.first();
     if (!checkShop) {
@@ -303,15 +311,20 @@ const AdminService = {
       if (!imageService.checkType(logo) || imageService.sizeBase64(logo) > 5) {
         throw new Error(MESSAGE.AVATAR_INVALID);
       }
-      formUpdate.logo = imageService.convertImage(logo, 'avatar');
-      imageService.deleteImage(checkShop.logo);
+      const newLogo = await cloudinary.uploader.upload(logo, {
+        folder: '/sale_final/logo',
+      });
+      const old_public_id = checkShop.logo.split('/').splice(-1)[0].slice(0, -4);
+      await cloudinary.uploader.destroy('sale_final/product/' + old_public_id);
+      formUpdate.logo = newLogo.secure_url;
+      // formUpdate.logo = imageService.convertImage(logo, 'avatar');
+      // imageService.deleteImage(checkShop.logo);
     }
-    const updateShop = await ques.update(formUpdate).returing('*').first();
-    updateShop.logo = `${host}/tmp/img/${updateShop.logo}`;
+    const updateShop = await ques.update(formUpdate).returning('*');
     return {
       code: 0,
       message: MESSAGE.EDIT_SHOP_SUCCESS,
-      payload: updateShop,
+      payload: updateShop[0],
     }
   },
 

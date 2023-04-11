@@ -33,7 +33,6 @@ async function editUserHandler(req, rep) {
   const body = {
     ...req.body,
     idUser: req.params.id,
-    host: req.headers.host,
   }
   const response = await AdminService.editUser(body);
   return rep.send(response);
@@ -43,7 +42,6 @@ async function editShopHandler(req, rep) {
   const body = {
     ...req.body,
     idShop: req.params.id,
-    host: req.headers.host,
   }
   const response = await AdminService.editShop(body);
   return rep.send(response);
