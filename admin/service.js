@@ -4,6 +4,7 @@ const MESSAGE = require('../constant/message');
 const passwordService = require('../base/password');
 const imageService = require('../base/image');
 const cloudinary = require('../base/cloudinary');
+const { v4 } = require('uuid');
 
 const AdminService = {
   async getListUser(query) {
@@ -315,7 +316,7 @@ const AdminService = {
         folder: '/sale_final/logo',
       });
       const old_public_id = checkShop.logo.split('/').splice(-1)[0].slice(0, -4);
-      await cloudinary.uploader.destroy('sale_final/product/' + old_public_id);
+      await cloudinary.uploader.destroy('sale_final/logo/' + old_public_id);
       formUpdate.logo = newLogo.secure_url;
       // formUpdate.logo = imageService.convertImage(logo, 'avatar');
       // imageService.deleteImage(checkShop.logo);
@@ -364,7 +365,7 @@ const AdminService = {
   },
 
   async editProduct(body) {
-    const { idProduct, name, quantity, price, imagesAdd, imagesRemove, host } = body;
+    const { idProduct, name, quantity, price, imagesAdd, imagesRemove } = body;
     const ques = pg.from('product').where({ id: idProduct });
     const checkProduct = await ques.clone().first();
     if (!checkProduct) {
@@ -380,84 +381,111 @@ const AdminService = {
     if (price) {
       formUpdate.price = price;
     }
-    let publicProduct = [];
-    let updateProduct = {};
-    await pg.transaction(async (trx) => {
-      updateProduct = await ques.update(formUpdate).returing('*').first().transacting(trx);
-      if (imagesAdd && imagesAdd.length > 0) {
-        imagesAdd.forEach(async (image) => {
-          if (!imageService.checkType(image) || imageService.sizeBase64(image) > 5) {
-            throw new Error(MESSAGE.IMAGE_INVALID);
-          }
-        });
-        publicProduct = imagesAdd.map((image) => {
-          return imageService.convertImage(image, 'product');
-        });
+    const trx = await pg.transaction();
+    await ques.update(formUpdate).transacting(trx);
+    if (imagesAdd && imagesAdd.length > 0) {
+      imagesAdd.forEach((i) => {
+        if (!imageService.checkType(i) || imageService.sizeBase64(i) > 5) {
+          throw new Error(MESSAGE.IMAGE_INVALID);
+        }
+      });
+      const uploadImage = imagesAdd.map((i) => cloudinary.uploader.upload(i, {
+        folder: '/sale_final/product'
+      }));
+      const listI = await Promise.all(uploadImage);
+      await trx('productImage').insert(listI.map((u) => ({
+        id: v4(),
+        image: u.secure_url,
+        id_product: idProduct
+      })));
+    }
+    if (imagesRemove && imagesRemove.length > 0) {
+      await trx('productImage').del().whereIn('image', imagesRemove).andWhere('id_product', id_product);
+      const delImage = imagesRemove.map((i) => {
+        const public_id = i.split('/').splice(-1)[0].slice(0, -4);
+        return cloudinary.uploader.destroy('sale_final/product/' + public_id);
+      });
+      await Promise.all(delImage);
+    }
+    await trx.commit();
+    // await pg.transaction(async (trx) => {
+    //   updateProduct = await ques.update(formUpdate).returing('*').first().transacting(trx);
+    //   if (imagesAdd && imagesAdd.length > 0) {
+    //     imagesAdd.forEach(async (image) => {
+    //       if (!imageService.checkType(image) || imageService.sizeBase64(image) > 5) {
+    //         throw new Error(MESSAGE.IMAGE_INVALID);
+    //       }
+    //     });
+    //     publicProduct = imagesAdd.map((image) => {
+    //       return imageService.convertImage(image, 'product');
+    //     });
 
 
-        await pg.from('productImage').insert(publicProduct.map((pI) => ({
-          id: v4(),
-          id_product: updateProduct.id,
-          image: pI,
-        }))).transacting(trx);
-      }
+    //     await pg.from('productImage').insert(publicProduct.map((pI) => ({
+    //       id: v4(),
+    //       id_product: updateProduct.id,
+    //       image: pI,
+    //     }))).transacting(trx);
+    //   }
 
-      if (imagesRemove && imagesRemove.length > 0) {
-        const fixList = imagesRemove.map((image) => image.split('public/img/')[1]);
-        await pg.from('productImage').del().whereIn('image', fixList).transacting(trx);
-        fixList.forEach((image) => {
-          imageService.deleteImage(image);
-        });
-      }
-    });
-    // lấy toàn bộ ảnh sản phẩm hiện tại
-    const curImage = await pg.from('productImage').where('id_product', idProduct).select('image');
-    newProduct[0].images = curImage.map((i) => `${host}/tmp/img/${i.image}`);
+    //   if (imagesRemove && imagesRemove.length > 0) {
+    //     const fixList = imagesRemove.map((image) => image.split('public/img/')[1]);
+    //     await pg.from('productImage').del().whereIn('image', fixList).transacting(trx);
+    //     fixList.forEach((image) => {
+    //       imageService.deleteImage(image);
+    //     });
+    //   }
+    // });
+    // // lấy toàn bộ ảnh sản phẩm hiện tại
+    // const curImage = await pg.from('productImage').where('id_product', idProduct).select('image');
+    // newProduct[0].images = curImage.map((i) => `${host}/tmp/img/${i.image}`);
     return {
       code: 0,
       message: MESSAGE.EDIT_PRODUCT_SUCCESS,
-      payload: updateProduct,
     }
   },
 
   async createShop(body) {
-    const { name, idUser, address, logo, host } = body;
-    if (checkLimitShop.count <= 0) {
+    const { name, idUser, address, logo } = body;
+    const checkLimitShop = await pg('user').where({
+      id: idUser,
+      role: 'seller'
+    }).first();
+    if (checkLimitShop.numberShop <= 0) {
       return {
         code: 400,
         message: MESSAGE.LIMIT_CREATE_SHOP
       }
     }
-
+    const trx = await pg.transaction();
     if (!imageService.checkType(logo) || imageService.sizeBase64(logo) > 5) {
       throw new Error(MESSAGE.AVATAR_INVALID);
     }
-
-    const publicLogo = imageService.convertImage(logo, 'logo');
-    const id = v4();
+    const publicLogo = await cloudinary.uploader.upload(logo, {
+      folder: '/sale_final/logo'
+    })
+    // const publicLogo = imageService.convertImage(logo, 'logo');
     const dataSave = {
       name,
       id_user: idUser,
       address,
-      logo: publicLogo,
-      id,
+      logo: publicLogo.secure_url,
+      id: v4(),
     }
-    const saveShop = await pg.from('shop').insert(dataSave).returning('*').first();
+    const saveShop = await trx('shop').insert(dataSave).returning('*');
+    await trx('user').where('id', idUser).decrement('numberShop', 1);
+    await trx.commit();
     return {
       code: 0,
       message: MESSAGE.CREATE_SHOP_SUCCESS,
-      payload: {
-        ...saveShop,
-        logo: `${host}/tmp/img/${saveShop.logo}`,
-      }
+      payload: saveShop[0]
     }
   },
 
   async createProduct(body) {
-    const { name, quantity, price, idShop, idUser, images, host } = body;
+    const { name, quantity, price, idShop, idUser, images } = body;
     const checkOwnerShop = await pg.from('shop').where({
       id: idShop,
-      id_user: idUser,
     }).first();
     if (!checkOwnerShop) {
       return {
@@ -466,31 +494,54 @@ const AdminService = {
       }
     };
     let publicProduct = [];
-    await pg.transaction(async (trx) => {
-      const newProduct = await pg.from('product').returning('id').insert({
-        name,
-        quantity,
-        price,
-        id_shop: idShop,
+    const trx = await pg.transaction();
+    const newProduct = await trx('product').insert({
+      name,quantity, id_shop: idShop, id: v4(), price
+    }).returning('*');
+    if (images && images.length > 0) {
+      images.forEach((i) => {
+        if (!imageService.checkType(i) || imageService.sizeBase64(i) > 5) {
+          throw new Error(MESSAGE.IMAGE_INVALID);
+        }
+      });
+      const uploadImage = images.map((i) => cloudinary.uploader.upload(i, {
+        folder: '/sale_final/product'
+      }))
+      publicProduct = await Promise.all(uploadImage);
+      await trx('productImage').insert(publicProduct.map((pP) => ({
         id: v4(),
-      }).transacting(trx);
-      if (images && images.length > 0) {
-        images.forEach(async (image) => {
-          if (!imageService.checkType(image) || imageService.sizeBase64(image) > 5) {
-            throw new Error(MESSAGE.IMAGE_INVALID);
-          }
-        });
-        publicProduct = images.map((image) => {
-          return imageService.convertImage(image, 'product');
-        });
-        await pg.from('productImage').insert(publicProduct.map((pI) => ({
-          id: v4(),
-          id_product: newProduct[0].id,
-          image: pI,
-        }))).transacting(trx);
-      }
+        image: pP.secure_url,
+        id_product: newProduct[0].id
+      })));
+    }
+    await trx.commit();
+    
 
-    });
+    // await pg.transaction(async (trx) => {
+    //   const newProduct = await pg.from('product').returning('id').insert({
+    //     name,
+    //     quantity,
+    //     price,
+    //     id_shop: idShop,
+    //     id: v4(),
+    //   }).transacting(trx);
+    //   if (images && images.length > 0) {
+    //     images.forEach(async (image) => {
+    //       if (!imageService.checkType(image) || imageService.sizeBase64(image) > 5) {
+    //         throw new Error(MESSAGE.IMAGE_INVALID);
+    //       }
+    //     });
+    //     publicProduct = images.map((image) => {
+    //       return imageService.convertImage(image, 'product');
+    //     });
+    //     await pg.from('productImage').insert(publicProduct.map((pI) => ({
+    //       id: v4(),
+    //       id_product: newProduct[0].id,
+    //       image: pI,
+    //     }))).transacting(trx);
+    //   }
+
+    // });
     return {
       code: 0,
       message: MESSAGE.CREATE_PRODUCT_SUCCESS,
@@ -500,7 +551,7 @@ const AdminService = {
         price,
         idShop,
         idUser,
-        images: publicProduct.map((pI) => `${host}/tmp/img/${pI}`),
+        images: publicProduct.map((pI) => pI.secure_url),
       }
     }
   },

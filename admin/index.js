@@ -60,27 +60,18 @@ async function editProductHandler(req, rep) {
   const body = {
     ...req.body,
     idProduct: req.params.id,
-    host: req.headers.host,
   }
   const response = await AdminService.editProduct(body);
   return rep.send(response);
 }
 
 async function createShopHandler(req, rep) {
-  const body = {
-    ...req.body,
-    host: req.headers.host,
-  }
-  const response = await AdminService.createShop(body);
+  const response = await AdminService.createShop(req.body);
   return rep.send(response);
 }
 
 async function createProductHandler(req, rep) {
-  const body = {
-    ...req.body,
-    host: req.headers.host,
-  }
-  const response = await AdminService.createProduct(body);
+  const response = await AdminService.createProduct(req.body);
   return rep.send(response);
 }
 
