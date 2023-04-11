@@ -202,11 +202,12 @@ const SellerService = {
   },
 
   async getProduct(query) {
-    const { host, idUser, idProduct } = query;
+    const { idUser, idProduct } = query;
     const product = await pg.from('product')
       .where('product.id', idProduct)
       .join('shop', 'shop.id', 'product.id_shop')
-      .where('shop.id_user', idUser).first();
+      .where('shop.id_user', idUser).first()
+      .select('address', 'quantity', 'price', 'id_shop', 'logo');
     if (!product) {
       return {
         code: 400,
@@ -215,8 +216,7 @@ const SellerService = {
     }
     const productImage = await pg.from('productImage').where('id_product', idProduct)
       .select('image');
-    product.logo = `${host}/tmp/img/${product.logo}`;
-    product.images = productImage.map((i) => `${host}/tmp/img/${i.image}`);
+    product.images = productImage.map((i) => i.image);
     return {
       code: 0,
       message: MESSAGE.SEARCH_PRODUCT_SUCCESS,
@@ -225,7 +225,7 @@ const SellerService = {
   },
 
   async getListProduct(query) {
-    let { idShop, pageIndex, pageSize, idUser, host } = query;
+    let { idShop, pageIndex, pageSize, idUser } = query;
     pageIndex = +pageIndex || 1;
     pageSize = +pageSize || 20;
     const shop = await pg.from('shop')
@@ -250,7 +250,7 @@ const SellerService = {
     listProduct = listProduct.map((pro) => {
       pro.images = listImageProduct.reduce((init, ima) => {
         if (ima.id_product === pro.id) {
-          init.push(`${host}/tmp/img/${ima.image}`);
+          init.push(ima.image);
         }
         return init;
       }, []);

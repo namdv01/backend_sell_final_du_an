@@ -8,7 +8,6 @@ async function createProductHandler(req, rep) {
   const body = {
     ...req.body,
     id_user: req.user.id,
-    host: req.headers.host,
   }
   const response = await SellerService.createProduct(body);
   return rep.send(response);
@@ -18,7 +17,6 @@ async function editProductHandler(req, rep) {
   const body = {
     id_product: req.params.id,
     id_user: req.user.id,
-    host: req.headers.host,
     ...req.body,
   }
   const response = await SellerService.editProduct(body);
@@ -32,7 +30,6 @@ async function delProductHandler(req, rep) {
 
 async function getProductHandler(req, rep) {
   const query = {
-    host: req.headers.host,
     idUser: req.user.id,
     idProduct: req.params.id,
   }
@@ -45,7 +42,6 @@ async function getListProductHandler(req, rep) {
     idShop: req.params.idShop,
     ...req.query,
     idUser: req.user.id,
-    host: req.headers.host,
   }
   const response = await SellerService.getListProduct(query);
   return rep.send(response);
@@ -84,7 +80,6 @@ async function createShopHandler(req, rep) {
   const body = {
     ...req.body,
     id_user: req.user.id,
-    host: req.headers.host,
   }
   const response = await SellerService.createShop(body);
   return rep.send(response);
@@ -95,7 +90,6 @@ async function editShopHandler(req, rep) {
     ...req.body,
     id_user: req.user.id,
     id_shop: req.params.id,
-    host: req.headers.host,
   }
   const response = await SellerService.editShop(body);
   return rep.send(response);
@@ -110,7 +104,6 @@ async function getListShopHandler(req, rep) {
   const query = {
     ...req.query,
     id_user: req.user.id,
-    host: req.headers.host,
   }
   const response = await SellerService.getListShop(query);
   return rep.send(response);
