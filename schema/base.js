@@ -70,12 +70,12 @@ const baseSchema = {
     pattern: '^[0-9]*$'
   },
   priceMin: {
-    type: 'string',
+    type: ['string', 'integer'],
     pattern: '^[0-9]*$',
     minimum: 0,
   },
   priceMax: {
-    type: 'string',
+    type: ['string', 'integer'],
     pattern: '^[0-9]*$',
     minimum: 0,
     exclusiveMinimum: { $data: '1/priceMin' },
@@ -84,7 +84,7 @@ const baseSchema = {
     type: 'string',
   },
   quantity: {
-    type: 'integer',
+    type: ['string', 'integer'],
     minimum: 0,
   },
   id: {

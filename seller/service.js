@@ -7,7 +7,7 @@ const cloudinary = require('../base/cloudinary');
 const SellerService = {
   // product
   async createProduct(body) {
-    const { name, quantity, price, idShop: id_shop, id_user, images, host } = body;
+    const { name, quantity, price, idShop: id_shop, id_user, images } = body;
     const checkOwnerShop = await pg.from('shop').where({
       id: id_shop,
       id_user,
@@ -19,40 +19,65 @@ const SellerService = {
       }
     };
     let publicProduct = [];
-    await pg.transaction(async (trx) => {
-      const newProduct = await pg.from('product').returning('id').insert({
-        name,
-        quantity,
-        price,
-        id_shop,
+    const trx = await pg.transaction();
+    const newProduct = await trx.from('product').insert({
+      name,
+      quantity,
+      price,
+      id_shop,
+      id: v4()
+    }).returning('*');
+    if (images && images.length > 0) {
+      images.forEach((i) => {
+        if(!imageService.checkType(i) || imageService.sizeBase64(i) > 5) {
+          throw new Error(MESSAGE.IMAGE_INVALID);
+        }
+      });
+      const arrUpload = images.map((i) => 
+      cloudinary.uploader.upload(i, {
+        folder: '/sale_final/product'
+      }));
+      const listImage = await Promise.all(arrUpload);
+      publicProduct = await trx('productImage').insert(listImage.map((li) => ({
         id: v4(),
-      }).transacting(trx);
-      if (images && images.length > 0) {
-        images.forEach(async (image) => {
-          if (!imageService.checkType(image) || imageService.sizeBase64(image) > 5) {
-            throw new Error(MESSAGE.IMAGE_INVALID);
-          }
-        });
-        publicProduct = images.map((image) => {
-          return imageService.convertImage(image, 'product');
-        });
-        await pg.from('productImage').insert(publicProduct.map((pI) => ({
-          id: v4(),
-          id_product: newProduct[0].id,
-          image: pI,
-        }))).transacting(trx);
-      }
+        id_product: newProduct[0].id,
+        image: li.secure_url,
+      }))).returning('image');
+    }
+    await trx.commit();
 
-    });
+    // await pg.transaction(async (trx) => {
+    //   const newProduct = await pg.from('product').returning('id').insert({
+    //     name,
+    //     quantity,
+    //     price,
+    //     id_shop,
+    //     id: v4(),
+    //   }).transacting(trx);
+    //   if (images && images.length > 0) {
+    //     images.forEach(async (image) => {
+    //       if (!imageService.checkType(image) || imageService.sizeBase64(image) > 5) {
+    //         throw new Error(MESSAGE.IMAGE_INVALID);
+    //       }
+    //     });
+    //     publicProduct = images.map((image) => {
+    //       return imageService.convertImage(image, 'product');
+    //     });
+    //     await pg.from('productImage').insert(publicProduct.map((pI) => ({
+    //       id: v4(),
+    //       id_product: newProduct[0].id,
+    //       image: pI,
+    //     }))).transacting(trx);
+    //   }
+
+    // });
     return {
       code: 0,
       message: MESSAGE.CREATE_PRODUCT_SUCCESS,
       payload: {
-        name,
-        quantity,
-        price,
-        id_shop,
-        images: publicProduct.map((pI) => `${host}/tmp/img/${pI}`),
+        ...newProduct[0],
+        images: publicProduct.map((pp) => pp.image)
+        // images: publicProduct.map((pI) => `${host}/tmp/img/${pI}`),
       }
     }
   },
@@ -219,7 +244,7 @@ const SellerService = {
 
   //shop
   async createShop(body) {
-    const { name, id_user, address, logo, host } = body;
+    const { name, id_user, address, logo } = body;
     const checkLimitShop = await pg.from('user').where({
       id: id_user
     }).count('numberShop').first();
@@ -245,7 +270,10 @@ const SellerService = {
       logo: save_logo.secure_url,
       id,
     }
-    const saveShop = await pg.from('shop').insert(dataSave).returning('*');
+    const trx = await pg.transaction();
+    const saveShop = await trx('shop').insert(dataSave).returning('*');
+    await trx('user').decrement('numberShop', 1).where({id: id_user});
+    await trx.commit();
     return {
       code: 0,
       message: MESSAGE.CREATE_SHOP_SUCCESS,
