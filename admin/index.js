@@ -10,20 +10,12 @@ async function registerHandler(req, rep) {
 }
 
 async function getListUserHandler(req, rep) {
-  const query = {
-    ...req.query,
-    host: req.headers.host,
-  }
-  const response = await AdminService.getListUser(query);
+  const response = await AdminService.getListUser(req.query);
   return rep.send(response);
 }
 
 async function getListShopHandler(req, rep) {
-  const query = {
-    ...req.query,
-    host: req.headers.host,
-  }
-  const response = await AdminService.getListShop(query);
+  const response = await AdminService.getListShop(req.query);
   return rep.send(response);
 }
 

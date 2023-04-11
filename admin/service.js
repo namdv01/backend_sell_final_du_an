@@ -6,7 +6,7 @@ const imageService = require('../base/image');
 
 const AdminService = {
   async getListUser(query) {
-    let { id, role, pageSize, pageIndex, host } = query;
+    let { id, role, pageSize, pageIndex } = query;
     const ques = pg('user');
     let lstUser;
     if (id) {
@@ -15,7 +15,6 @@ const AdminService = {
       if (!lstUser) {
         throw new Error(MESSAGE.ID_NOK);
       }
-      lstUser.avatar = `${host}/tmp/img/${lstUser.avatar}`;
       return {
         code: 0,
         message: MESSAGE.GET_LIST_USER_SUCCESS,
@@ -30,7 +29,6 @@ const AdminService = {
     const totalUser = await ques.clone().count('*').first();
     lstUser = await ques.limit(pageSize).offset((pageIndex - 1) * pageSize)
       .select('id', 'email', 'fullname', 'phone', 'avatar', 'gender', 'role', 'numberShop');
-    lstUser = lstUser.map((u) => ({ ...u, avatar: `${host}/tmp/img/${u.avatar}` }));
     return {
       code: 0,
       message: MESSAGE.GET_LIST_USER_SUCCESS,
@@ -44,7 +42,7 @@ const AdminService = {
   },
 
   async getListShop(query) {
-    let { id, idUser, pageIndex, pageSize, host } = query;
+    let { id, idUser, pageIndex, pageSize } = query;
     const ques = pg('shop');
     let lstShop;
     if (id) {
@@ -52,7 +50,6 @@ const AdminService = {
       if (!lstShop) {
         throw new Error(MESSAGE.ID_NOK);
       }
-      lstShop.logo = `${host}/tmp/img/${lstShop.logo}`;
       return {
         code: 0,
         message: MESSAGE.GET_LIST_SHOP_SUCCESS,
@@ -66,10 +63,9 @@ const AdminService = {
     pageSize = +pageSize || PAGINATION.SIZE;
     pageIndex = +pageIndex || PAGINATION.INDEX;
     lstShop = await ques.limit(pageSize).offset((pageIndex - 1) * pageSize);
-    lstShop = lstShop.map((shop) => ({ ...shop, logo: `${host}/tmp/img/${shop.logo}` }));
     return {
       code: 0,
-      message: MESSAGE.GET_LIST_PRODUCT_SUCCESS,
+      message: MESSAGE.GET_LIST_SHOP_SUCCESS,
       payload: {
         shops: lstShop,
         pageIndex,
