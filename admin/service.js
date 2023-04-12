@@ -579,7 +579,7 @@ const AdminService = {
     await trx('shop').where({ id: idShop }).del();
     const oldProduct = await trx('product').where('id_shop', idShop).del().returning('id');
     await trx('cart').whereIn('id_product', oldProduct.map((o) => o.id)).del();
-    const oldImage = await trx('productImage').whereIn('id_product', oldProduct.map((o) => o.id)).returning('image');
+    const oldImage = await trx('productImage').whereIn('id_product', oldProduct.map((o) => o.id)).del().returning('image');
     const public_logo = shop.logo.split('/').splice(-1)[0].slice(0, -4);
     await cloudinary.uploader.destroy('sale_final/logo/' + public_logo);
     const delImage = oldImage.map((o) => {
