@@ -282,7 +282,7 @@ const AdminService = {
       // imageService.deleteImage(checkAdmin.avatar);
     }
     const updateUser = await ques.update(formUpdate).returning('*');
-    if(avatar) {
+    if (avatar) {
       const public_id = checkAdmin.split('/').splice(-1)[0].slice(0, -4);
       await cloudinary.uploader.destroy('sale_final/product/' + public_id);
     }
@@ -496,7 +496,7 @@ const AdminService = {
     let publicProduct = [];
     const trx = await pg.transaction();
     const newProduct = await trx('product').insert({
-      name,quantity, id_shop: idShop, id: v4(), price
+      name, quantity, id_shop: idShop, id: v4(), price
     }).returning('*');
     if (images && images.length > 0) {
       images.forEach((i) => {
@@ -515,7 +515,7 @@ const AdminService = {
       })));
     }
     await trx.commit();
-    
+
 
     // await pg.transaction(async (trx) => {
     //   const newProduct = await pg.from('product').returning('id').insert({
@@ -568,13 +568,26 @@ const AdminService = {
       }
     }
 
-    await pg.transaction(async (trx) => {
-      // chỉ xóa sản phẩm ko xóa đơn hàng
-      await pg.from('shop').where({ id: idShop }).del().transacting(trx);
-      const oldProduct = await pg.from('product').where('id_shop', idShop).del().returning('id').transacting(trx);
-      const fixIdProduct = oldProduct.map((pro) => pro.id);
-      await pg.from('productImage').whereIn('id_product', fixIdProduct).transacting(trx);
+    // await pg.transaction(async (trx) => {
+    //   // chỉ xóa sản phẩm ko xóa đơn hàng
+    //   await pg.from('shop').where({ id: idShop }).del().transacting(trx);
+    //   const oldProduct = await pg.from('product').where('id_shop', idShop).del().returning('id').transacting(trx);
+    //   const fixIdProduct = oldProduct.map((pro) => pro.id);
+    //   await pg.from('productImage').whereIn('id_product', fixIdProduct).transacting(trx);
+    // });
+    const trx = await pg.transaction();
+    await trx('shop').where({ id: idShop }).del();
+    const oldProduct = await trx('product').where('id_shop', idShop).del().returning('id');
+    await trx('cart').whereIn('id_product', oldProduct.map((o) => o.id)).del();
+    const oldImage = await trx('productImage').whereIn('id_product', oldProduct.map((o) => o.id)).returning('image');
+    const public_logo = shop.logo.split('/').splice(-1)[0].slice(0, -4);
+    await cloudinary.uploader.destroy('sale_final/logo/' + public_logo);
+    const delImage = oldImage.map((o) => {
+      const public_id = o.image.split('/').splice(-1)[0].slice(0, -4);
+      return cloudinary.uploader.destroy('sale_final/product/' + public_id);
     });
+    await Promise.all(delImage);
+    await trx.commit();
     return {
       code: 0,
       message: MESSAGE.DEL_SHOP_SUCCESS,
@@ -589,15 +602,25 @@ const AdminService = {
         message: MESSAGE.ID_NOK
       }
     }
-    await pg.transaction(async (trx) => {
-      await pg.from('product').where('id', idProduct).del().transacting(trx);
-      await pg.from('cart').where('id_product', idProduct).del().transacting(trx);
-      // không xóa trong đơn hàng và comment vì là nội dung liên quan đến buyer còn giỏ hàng thì bỏ được
-      const oldImages = await pg.from('productImage').returning('image').where('id_product', idProduct).del().transacting(trx);
-      oldImages.forEach((item) => {
-        imageService.deleteImage(item.image);
-      })
+    // await pg.transaction(async (trx) => {
+    //   await pg.from('product').where('id', idProduct).del().transacting(trx);
+    //   await pg.from('cart').where('id_product', idProduct).del().transacting(trx);
+    //   // không xóa trong đơn hàng và comment vì là nội dung liên quan đến buyer còn giỏ hàng thì bỏ được
+    //   const oldImages = await pg.from('productImage').returning('image').where('id_product', idProduct).del().transacting(trx);
+    //   oldImages.forEach((item) => {
+    //     imageService.deleteImage(item.image);
+    //   })
+    // });
+    const trx = await pg.transaction();
+    await trx('product').where('id', idProduct).del();
+    await trx('cart').where('id_product', idProduct).del();
+    const oldImage = await trx('productImage').where('id_product', idProduct).del().returning('image');
+    const delImage = oldImage.map((o) => {
+      const public_id = o.image.split('/').splice(-1)[0].slice(0, -4);
+      return cloudinary.uploader.destroy('sale_final/product/' + public_id);
     });
+    await Promise.all(delImage);
+    await trx.commit();
     return {
       code: 0,
       message: MESSAGE.DEL_PRODUCT_SUCCESS,
