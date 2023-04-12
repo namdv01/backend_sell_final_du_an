@@ -178,8 +178,9 @@ const SellerService = {
   },
 
   async delProduct(idUser, idProduct) {
-    const checkOwn = await pg.from('product').where('id', idProduct)
-      .join('shop', 'shop.id_user', idUser).select('shop.id').first();
+    const checkOwn = await pg.from('product').where('product.id', idProduct)
+      .join('shop', 'shop.id', 'product.id_shop')
+      .where('shop.id_user', idUser).select('*').first();
     if (!checkOwn) {
       return {
         code: 0,
