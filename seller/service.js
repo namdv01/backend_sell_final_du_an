@@ -191,7 +191,7 @@ const SellerService = {
     await pg('product').where('id', idProduct).del();
     await trx('cart').where('id_product', idProduct).del();
     const listImage = await trx('productImage').where('id_product', idProduct).del().returning('image');
-    const delImage = listImage((li) => {
+    const delImage = listImage.map((li) => {
       const public_id = li.image.split('/').splice(-1)[0].slice(0, -4);
       return cloudinary.uploader.destroy('sale_final/product' + public_id);
     });
