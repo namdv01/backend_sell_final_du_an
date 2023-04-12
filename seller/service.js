@@ -190,10 +190,10 @@ const SellerService = {
     const trx = await pg.transaction();
     await trx('product').where('id', idProduct).del();
     await trx('cart').where('id_product', idProduct).del();
-    const listImage = await trx('productImage').where('id_product', idProduct).del().returning('image');
-    const delImage = listImage.map((li) => {
-      const public_id = li.image.split('/').splice(-1)[0].slice(0, -4);
-      return cloudinary.uploader.destroy('sale_final/product' + public_id);
+    const oldImage = await trx('productImage').where('id_product', idProduct).del().returning('image');
+    const delImage = oldImage.map((o) => {
+      const public_id = o.image.split('/').splice(-1)[0].slice(0, -4);
+      return cloudinary.uploader.destroy('sale_final/product/' + public_id);
     });
     await Promise.all(delImage);
     await trx.commit();
