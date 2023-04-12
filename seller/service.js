@@ -188,7 +188,7 @@ const SellerService = {
       }
     }
     const trx = await pg.transaction();
-    await pg('product').where('id', idProduct).del();
+    await trx('product').where('id', idProduct).del();
     await trx('cart').where('id_product', idProduct).del();
     const listImage = await trx('productImage').where('id_product', idProduct).del().returning('image');
     const delImage = listImage.map((li) => {
