@@ -32,12 +32,12 @@ async function changePasswordHandler(req, rep) {
 }
 
 async function searchProductHandler(req, rep) {
-  const response = await CommonService.searchProduct(req.query, req.headers.host);
+  const response = await CommonService.searchProduct(req.query);
   return rep.send(response);
 }
 
 async function getDetailProductHandler(req, rep) {
-  const response = await CommonService.getDetailProduct(req.params.id, req.headers.host);
+  const response = await CommonService.getDetailProduct(req.params.id);
   return rep.send(response);
 }
 

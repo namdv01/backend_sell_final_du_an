@@ -146,7 +146,7 @@ const CommonService = {
     }
   },
 
-  async searchProduct({ pageIndex, pageSize, name, priceMin, priceMax }, host) {
+  async searchProduct({ pageIndex, pageSize, name, priceMin, priceMax }) {
     const query = pg('product');
     pageIndex = +pageIndex || PAGINATION.INDEX;
     pageSize = +pageSize || PAGINATION.SIZE;
@@ -169,7 +169,7 @@ const CommonService = {
     for (let i = 0; i < lstProduct.length; i++) {
       lstProduct[i].images = lstImageProduct.reduce((init, item) => {
         if (item.id_product === lstIdProduct[i]) {
-          init.push(`${host}/tmp/img/${item.image}`);
+          init.push(item.image);
         }
         return init;
       }, []);
@@ -186,7 +186,7 @@ const CommonService = {
     }
   },
 
-  async getDetailProduct(idProduct, host) {
+  async getDetailProduct(idProduct) {
     const product = await pg('product')
       .where({ 'product.id': idProduct })
       .leftJoin('shop', 'product.id_shop', 'shop.id')
@@ -199,8 +199,7 @@ const CommonService = {
     const imageProduct = await pg('productImage')
       .where({ id_product: idProduct })
       .select('image');
-    product.images = imageProduct.map(item => `${host}/tmp/img/${item.image}`);
-    product.logo = `${host}/tmp/img/${product.logo}`;
+    product.images = imageProduct.map(item => item.image);
     return {
       code: 0,
       message: MESSAGE.SEARCH_PRODUCT_SUCCESS,
