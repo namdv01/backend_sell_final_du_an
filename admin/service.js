@@ -355,11 +355,11 @@ const AdminService = {
     if (payment ?? false) {
       formUpdate.payment = !!payment;
     }
-    const updateOrder = await ques.update(formUpdate).returning('*').first();
+    const updateOrder = await ques.update(formUpdate).returning('*');
     return {
       code: 0,
       message: MESSAGE.EDIT_ORDER_SUCCESS,
-      payload: updateOrder,
+      payload: updateOrder[0],
     }
 
   },
