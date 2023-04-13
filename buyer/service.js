@@ -293,7 +293,7 @@ const BuyerService = {
   },
 
   async getCart(query) {
-    const { idUser, host } = query;
+    const { idUser } = query;
     let cart = await pg.from('cart').where('id_user', idUser)
       .join('product', 'product.id', 'cart.id_product')
       .select({
@@ -306,7 +306,7 @@ const BuyerService = {
     const productImage = await pg.from('productImage').whereIn('id_product', listIdProduct);
     cart = cart.map((c) => {
       const i = productImage.find((pI) => pI.id_product = c.id_product);
-      c.image = `${host}/tmp/img/${i.image}`;
+      c.image = i.image;
       return c;
     });
     return {

@@ -78,7 +78,6 @@ async function editCartHandler(req, rep) {
 
 async function getCartHandler(req, rep) {
   const query = {
-    host: req.headers.host,
     idUser: req.user.id,
   }
   const response = await BuyerService.getCart(query);
