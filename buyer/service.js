@@ -223,18 +223,20 @@ const BuyerService = {
     const comment = await pg.from('comment')
       .join('order', 'order.id', 'comment.id_order')
       .join('orderDetail', 'orderDetail.id_order', 'order.id')
-      .join('product', 'product.id', 'orderDetail.id_product')
+      .join('product', 'product.id', 'comment.id_product')
       .where({
         'comment.id': idComment,
         'order.id_buyer': idUser,
       })
-      .select({
-        id: 'comment.id',
-        content: 'comment.content',
-        star: 'content.star',
-        name: 'product.name',
-        id_order: 'order.id',
-      })
+      .select(
+        {
+          id: 'comment.id',
+          content: 'comment.content',
+          star: 'comment.star',
+          name: 'product.name',
+          id_order: 'order.id',
+        }
+      )
       .first();
     if (!comment) {
       throw new Error(MESSAGE.ID_NOK);
