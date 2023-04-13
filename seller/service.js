@@ -436,6 +436,12 @@ const SellerService = {
     }
     const formUpdate = {};
     if (status) {
+      if (order.status === 'cancel' || order.status === 'done') {
+        return {
+          code: 400,
+          message: MESSAGE.EDIT_ORDER_FAIL,
+        }
+      }
       formUpdate.status = status;
     }
     if (payment !== undefined) {
