@@ -444,7 +444,13 @@ const SellerService = {
       }
       formUpdate.status = status;
     }
-    if (payment !== undefined) {
+    if (order.payment && (payment ?? false)) {
+      return {
+        code: 400,
+        message: MESSAGE.EDIT_ORDER_FAIL,
+      }
+    }
+    if (payment ?? false) {
       formUpdate.payment = !!payment;
     }
     await pg.from('order').update(formUpdate).where('id', idOrder);

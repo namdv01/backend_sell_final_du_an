@@ -346,14 +346,14 @@ const AdminService = {
       }
       formUpdate.status = status;
     }
-    if (payment) {
-      if (checkOrder.payment) {
-        return {
-          code: 400,
-          message: MESSAGE.EDIT_ORDER_FAIL
-        }
+    if (checkOrder.payment && (payment ?? false)) {
+      return {
+        code: 400,
+        message: MESSAGE.EDIT_ORDER_FAIL,
       }
-      formUpdate.payment = payment;
+    }
+    if (payment ?? false) {
+      formUpdate.payment = !!payment;
     }
     const updateOrder = await ques.update(formUpdate).returing('*').first();
     return {

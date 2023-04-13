@@ -126,7 +126,7 @@ const BuyerService = {
     pageSize = +pageSize || PAGINATION.SIZE;
     const ques = pg.from('comment')
       .join('order', 'order.id', 'comment.id_order')
-      .join('product', 'product.id', 'order.id_product')
+      .join('product', 'product.id', 'comment.id_product')
       .where('order.id_buyer', idUser);
     const totalComment = await ques.clone().count('*').first();
     const listComment = await ques.limit(pageSize).offset((pageIndex - 1) * pageSize)
