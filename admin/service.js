@@ -201,10 +201,10 @@ const AdminService = {
     let { idOrder, idProduct, star, pageIndex, pageSize } = query;
     const ques = pg.from('comment');
     if (idOrder) {
-      ques.where('id_order', idOrder);
+      ques.where('comment.id_order', idOrder);
     }
     if (idProduct) {
-      ques.where('id_product', idProduct);
+      ques.where('comment.id_product', idProduct);
     }
     if (star) {
       ques.where('star', star);
@@ -213,8 +213,8 @@ const AdminService = {
     pageIndex = +pageIndex || PAGINATION.INDEX;
     pageSize = +pageSize || PAGINATION.SIZE;
     let comments = await ques.limit(pageSize).offset((pageIndex - 1) * pageSize);
-    const listIdOrder = orders.map((o) => o.id_order);
-    const orders = await pg.from('order').whereIn('id', listIdOrder)
+    const listIdOrder = comments.map((o) => o.id_order);
+    const orders = await pg.from('order').whereIn('order.id', listIdOrder)
       .join('orderDetail', 'orderDetail.id_order', 'order.id')
       .join('user', 'user.id', 'order.id_buyer')
       .select({
