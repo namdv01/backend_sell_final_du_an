@@ -211,7 +211,7 @@ const CommonService = {
     const shop = await pg('shop').where('id', idShop)
       .select('logo', 'name', 'address').first();
     const product = await pg('product')
-      .where('idShop', idShop)
+      .where('id_shop', idShop)
       .select('name', 'quantity', 'id');
     const fixListProduct = product.map((p) => p.id);
     const productImage = await pg('productImage').whereIn('id_product', fixListProduct).select('id', 'image', 'id_product');
@@ -231,6 +231,44 @@ const CommonService = {
         products: product
       }
     }
+  },
+
+  async productHot(query) {
+    let { pageSize } = query;
+    pageSize = +pageSize || 10;
+    const products = await pg('product')
+      .leftJoin('orderDetail as od', 'product.id', 'od.id_product')
+      .select({
+        'name': 'product.name',
+        'id': 'product.id',
+        'price': 'product.price',
+        'id_shop': 'product.id_shop',
+        'quantity': 'product.quantity',
+        'quantityBeSold': pg.raw('sum(case when od.quantity is not null then od.quantity else 0 end)')
+      })
+      .groupBy('product.name','product.id','product.price','product.id_shop')
+      .limit(pageSize)
+      .orderBy([
+        {column: 'quantityBeSold', order: 'desc'},
+        {column: 'name'},
+        {column: 'price'},
+        {column: 'quantity'}
+      ]);
+    const listIDProduct = products.map((item) => item.id);
+    const productImage = await pg('productImage').whereIn('id_product', listIDProduct);
+    for(let i = 0; i< listIDProduct.length; i++) {
+      products[i].images = productImage.reduce((init, item) => {
+        if(item.id_product === products[i].id) {
+          init.push(item.image);
+        }
+        return init;
+      }, []);
+    }
+    return {
+      code: 0,
+      message: MESSAGE.GET_LIST_PRODUCT_SUCCESS,
+      payload: products,
+    }  
   }
 
 }

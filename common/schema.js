@@ -232,6 +232,28 @@ const productInShop = {
   }
 }
 
+const productHot = {
+  response: baseSchema.response,
+  query: {
+    additionalProperties: false,
+    type: 'object',
+    properties: {
+      pageIndex: {
+        ...baseSchema.page,
+        errorMessage: {
+          _: MESSAGE.PAGE_NOK
+        }
+      },
+      pageSize: {
+        ...baseSchema.size,
+        errorMessage: {
+          _: MESSAGE.SIZE_NOK
+        }
+      },
+    }
+  }
+}
+
 module.exports = {
   register,
   login,
@@ -241,4 +263,5 @@ module.exports = {
   searchProduct,
   detailProduct,
   productInShop,
+  productHot,
 }

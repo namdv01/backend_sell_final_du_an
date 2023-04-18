@@ -1,5 +1,6 @@
 const CommonService = require('./service');
-const { register, login, changeProfile, checkLogin, changePassword, searchProduct, detailProduct, productInShop } = require('./schema');
+const { register, login, changeProfile, checkLogin, productHot,
+  changePassword, searchProduct, detailProduct, productInShop } = require('./schema');
 
 async function registerHandler(req, rep) {
   const response = await CommonService.register(req.body);
@@ -46,6 +47,11 @@ async function productInShopHandler(req, rep) {
   return rep.send(response);
 }
 
+async function productHotHandler(req, rep) {
+  const response = await CommonService.productHot(req.query);
+  return rep.send(response);
+}
+
 module.exports = async (fastify) => {
   fastify.post('/register', { schema: register }, registerHandler); // done
   fastify.post('/login', { schema: login }, loginHandler); // done
@@ -57,9 +63,11 @@ module.exports = async (fastify) => {
   fastify.post('/change-password', { schema: changePassword, preValidation: [fastify.auth] }, changePasswordHandler); // done
   fastify.get('/search-product', { schema: searchProduct }, searchProductHandler);  // done
   fastify.get('/detail-product/:id', { schema: detailProduct }, getDetailProductHandler); // done
-  fastify.get('/product-in-shop/:idShop', { schema: productInShop }, productInShopHandler);
+  fastify.get('/product-in-shop/:idShop', { schema: productInShop }, productInShopHandler); // done
+  fastify.get('/product-hot', { schema: productHot }, productHotHandler);
 
   fastify.setErrorHandler((error, req, rep) => {
+    console.log(error);
     return rep.code(200).send({ code: -1, message: error.message });
   });
 };
