@@ -217,6 +217,21 @@ const detailProduct = {
   }
 }
 
+const productInShop = {
+  response: baseSchema.response,
+  params: {
+    type: 'object',
+    properties: {
+      idShop: {
+        ...baseSchema.id,
+        errorMessage: {
+          _: MESSAGE.ID_NOK,
+        }
+      }
+    }
+  }
+}
+
 module.exports = {
   register,
   login,
@@ -225,4 +240,5 @@ module.exports = {
   changePassword,
   searchProduct,
   detailProduct,
+  productInShop,
 }

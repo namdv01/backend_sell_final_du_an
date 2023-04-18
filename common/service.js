@@ -207,6 +207,32 @@ const CommonService = {
     }
   },
 
+  async productInShop(idShop) {
+    const shop = await pg('shop').where('id', idShop)
+      .select('logo', 'name', 'address').first();
+    const product = await pg('product')
+      .where('idShop', idShop)
+      .select('name', 'quantity', 'id');
+    const fixListProduct = product.map((p) => p.id);
+    const productImage = await pg('productImage').whereIn('id_product', fixListProduct).select('id', 'image', 'id_product');
+    for (let i = 0; i < product.length; i++) {
+      product[i].images = productImage.reduce((init, item) => {
+        if (item.id_product === fixListProduct[i]) {
+          init.push(item.image);
+        }
+        return init;
+      }, []);
+    }
+    return {
+      code: 0,
+      message: MESSAGE.SEARCH_PRODUCT_SUCCESS,
+      payload: {
+        shop,
+        products: product
+      }
+    }
+  }
+
 }
 
 module.exports = CommonService;
