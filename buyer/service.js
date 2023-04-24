@@ -301,6 +301,7 @@ const BuyerService = {
         id_product: 'product.id',
         quantity: 'cart.quantity',
         name: 'product.name',
+        price: 'product.price',
       });
     const listIdProduct = cart.map((item) => item.id_product);
     const productImage = await pg.from('productImage').whereIn('id_product', listIdProduct);
