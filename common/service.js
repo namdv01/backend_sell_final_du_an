@@ -173,6 +173,23 @@ const CommonService = {
         }
         return init;
       }, []);
+      lstProduct[i].averageStar = 0;
+      lstProduct[i].totalReview = 0;
+    }
+    const listStar = await pg('comment').whereIn('id_product', lstIdProduct)
+      .select({
+        averageStar: pg.raw(`AVG(star) :: numeric(10,1)`),
+        totalReview: pg.raw(`COUNT(id)`),
+        idProduct: 'id_product',
+      })
+      .groupBy('idProduct');
+    for (let i = 0; i < lstProduct.length; i++) {
+      for (let j = 0; j < listStar.length; j++) {
+        if (lstProduct[i].id === listStar[j].idProduct) {
+          lstProduct[i].averageStar = +listStar[j].averageStar;
+          lstProduct[i].totalReview = +listStar[j].totalReview;
+        }
+      }
     }
     return {
       code: 0,
@@ -182,6 +199,7 @@ const CommonService = {
         pageSize,
         totalPage: Math.ceil(totalProduct.count / pageSize),
         products: lstProduct,
+        listStar,
       }
     }
   },
@@ -200,6 +218,16 @@ const CommonService = {
       .where({ id_product: idProduct })
       .select('image');
     product.images = imageProduct.map(item => item.image);
+    const commentProduct = await pg('comment').where('comment.id_product', idProduct)
+      .join('order', 'order.id', 'comment.id_order')
+      .join('user', 'user.id', 'order.id_buyer')
+      .select({
+        avatar: 'user.avatar',
+        fullname: 'user.fullname',
+        content: 'comment.content',
+        star: 'comment.star'
+      });
+    product.comments = commentProduct;
     return {
       code: 0,
       message: MESSAGE.SEARCH_PRODUCT_SUCCESS,
@@ -246,19 +274,19 @@ const CommonService = {
         'quantity': 'product.quantity',
         'quantityBeSold': pg.raw('sum(case when od.quantity is not null then od.quantity else 0 end)')
       })
-      .groupBy('product.name','product.id','product.price','product.id_shop')
+      .groupBy('product.name', 'product.id', 'product.price', 'product.id_shop')
       .limit(pageSize)
       .orderBy([
-        {column: 'quantityBeSold', order: 'desc'},
-        {column: 'name'},
-        {column: 'price'},
-        {column: 'quantity'}
+        { column: 'quantityBeSold', order: 'desc' },
+        { column: 'name' },
+        { column: 'price' },
+        { column: 'quantity' }
       ]);
     const listIDProduct = products.map((item) => item.id);
     const productImage = await pg('productImage').whereIn('id_product', listIDProduct);
-    for(let i = 0; i< listIDProduct.length; i++) {
+    for (let i = 0; i < listIDProduct.length; i++) {
       products[i].images = productImage.reduce((init, item) => {
-        if(item.id_product === products[i].id) {
+        if (item.id_product === products[i].id) {
           init.push(item.image);
         }
         return init;
@@ -268,7 +296,7 @@ const CommonService = {
       code: 0,
       message: MESSAGE.GET_LIST_PRODUCT_SUCCESS,
       payload: products,
-    }  
+    }
   }
 
 }
