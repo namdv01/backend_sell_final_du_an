@@ -199,7 +199,6 @@ const CommonService = {
         pageSize,
         totalPage: Math.ceil(totalProduct.count / pageSize),
         products: lstProduct,
-        listStar,
       }
     }
   },
