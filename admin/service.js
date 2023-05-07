@@ -48,7 +48,17 @@ const AdminService = {
     const ques = pg('shop');
     let lstShop;
     if (id) {
-      lstShop = await ques.where({ id }).first();
+      // lstShop = await ques.where({ id }).first();
+      lstShop = await ques.where('shop.id', id).join('user', 'user.id','shop.id_user').first()
+        .select({
+          id: 'shop.id',
+          idUser: 'shop.id_user',
+          shopName: 'shop.name',
+          logo: 'shop.logo',
+          address: 'shop.address',
+          fullname: 'user.fullname',
+          avatar: 'user.avatar',
+        })
       if (!lstShop) {
         throw new Error(MESSAGE.ID_NOK);
       }
@@ -65,6 +75,16 @@ const AdminService = {
     pageSize = +pageSize || PAGINATION.SIZE;
     pageIndex = +pageIndex || PAGINATION.INDEX;
     lstShop = await ques.limit(pageSize).offset((pageIndex - 1) * pageSize);
+    const listIdUser = lstShop.map((i) => i.id_user);
+    const listUser = await pg('user').whereIn('id', listIdUser);
+    for(let i = 0; i < lstShop.length; i++) {
+      for(let j = 0; j < listUser.length; j++) {
+        if (lstShop[i].id_user === listUser[j].id) {
+          lstShop[i].fullname = listUser[j].fullname;
+          lstShop[i].avatar = listUser[j].avatar;
+        }
+      }
+    }
     return {
       code: 0,
       message: MESSAGE.GET_LIST_SHOP_SUCCESS,
