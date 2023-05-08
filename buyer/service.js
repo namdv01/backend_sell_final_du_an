@@ -284,10 +284,15 @@ const BuyerService = {
       })
       cart = await pg.from('cart').insert(detail).returning('*').transacting(trx);
       const listIdProduct = cart.map((item) => item.id_product);
+      const products = await pg.from('product').whereIn('id_product', listIdProduct).select('id', 'name', 'price');
       const productImage = await pg.from('productImage').whereIn('id_product', listIdProduct);
       cart = cart.map((c) => {
         const i = productImage.find((pI) => pI.id_product = c.id_product);
         c.image = i.image;
+        const j = products.find((p) => p.id = c.id_product);
+        c.name = j.name;
+        c.price = j.price;
+        delete c.id_user;
         return c;
       });
     });
