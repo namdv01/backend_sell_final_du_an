@@ -282,8 +282,14 @@ const BuyerService = {
           quantity: d.quantity,
         }
       })
-
       cart = await pg.from('cart').insert(detail).returning('*').transacting(trx);
+      const listIdProduct = cart.map((item) => item.id_product);
+      const productImage = await pg.from('productImage').whereIn('id_product', listIdProduct);
+      cart = cart.map((c) => {
+        const i = productImage.find((pI) => pI.id_product = c.id_product);
+        c.image = i.image;
+        return c;
+      });
     });
     return {
       code: 0,
