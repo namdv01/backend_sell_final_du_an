@@ -49,7 +49,7 @@ const AdminService = {
     let lstShop;
     if (id) {
       // lstShop = await ques.where({ id }).first();
-      lstShop = await ques.where('shop.id', id).join('user', 'user.id','shop.id_user').first()
+      lstShop = await ques.where('shop.id', id).join('user', 'user.id', 'shop.id_user').first()
         .select({
           id: 'shop.id',
           idUser: 'shop.id_user',
@@ -77,8 +77,8 @@ const AdminService = {
     lstShop = await ques.limit(pageSize).offset((pageIndex - 1) * pageSize);
     const listIdUser = lstShop.map((i) => i.id_user);
     const listUser = await pg('user').whereIn('id', listIdUser);
-    for(let i = 0; i < lstShop.length; i++) {
-      for(let j = 0; j < listUser.length; j++) {
+    for (let i = 0; i < lstShop.length; i++) {
+      for (let j = 0; j < listUser.length; j++) {
         if (lstShop[i].id_user === listUser[j].id) {
           lstShop[i].fullname = listUser[j].fullname;
           lstShop[i].avatar = listUser[j].avatar;
@@ -158,11 +158,15 @@ const AdminService = {
       }
       detailOrder = await pg.from('orderDetail').where({ id_order: id })
         .join('product', 'product.id', 'orderDetail.id_product')
+        .join('order', 'order.id', 'orderDetail.id_order')
+        .join('user', 'user.id', 'order.id_buyer')
         .select({
           id: 'orderDetail.id',
           name: 'product.name',
           price: 'orderDetail.price',
           quantity: 'orderDetail.quantity',
+          nameBuyer: 'user.fullname',
+          logo: 'user.logo'
         });
       listOrder.detail = detailOrder;
       return {
@@ -172,13 +176,13 @@ const AdminService = {
       }
     }
     if (idBuyer) {
-      ques.where('id_buyer', idBuyer);
+      ques.where('order.id_buyer', idBuyer);
     }
     if (status) {
-      ques.where('status', status);
+      ques.where('order.status', status);
     }
     if (payment) {
-      ques.where('payment', payment);
+      ques.where('order.payment', payment);
     }
     const totalOrder = await ques.clone().count('*').first();
     pageSize = +pageSize || PAGINATION.SIZE;
@@ -187,21 +191,29 @@ const AdminService = {
     const listIdOrder = listOrder.map((lo) => lo.id);
     detailOrder = await pg.from('orderDetail').whereIn('id_order', listIdOrder)
       .join('product', 'product.id', 'orderDetail.id_product')
+      .join('order', 'order.id', 'orderDetail.id_order')
+      .join('user', 'user.id', 'order.id_buyer')
       .select({
         id: 'orderDetail.id',
         id_order: 'orderDetail.id_order',
         name: 'product.name',
         price: 'orderDetail.price',
         quantity: 'orderDetail.quantity',
+        nameBuyer: 'user.fullname',
+        avatar: 'user.avatar'
       });
     listOrder = listOrder.map((lo) => {
+      const userD = {};
       lo.detail = detailOrder.reduce((init, de) => {
         if (de.id_order === lo.id) {
-          const { id_order, ...rest } = de;
+          const { id_order, nameBuyer, avatar, ...rest } = de;
           init.push(rest);
+          userD.nameBuyer = nameBuyer;
+          userD.avatar = avatar;
         }
         return init;
       }, []);
+      lo = { ...lo, ...userD };
       return lo;
     });
 
@@ -237,19 +249,31 @@ const AdminService = {
     const orders = await pg.from('order').whereIn('order.id', listIdOrder)
       .join('orderDetail', 'orderDetail.id_order', 'order.id')
       .join('user', 'user.id', 'order.id_buyer')
+      .join('product', 'product.id', 'orderDetail.id_product')
       .select({
         name: 'user.fullname',
+        avatar: 'user.avatar',
         id_orderDetail: 'orderDetail.id',
         id_order: 'order.id',
         id_product: 'orderDetail.id_product',
+        nameProduct: 'product.name',
+        price: 'product.price',
+        orderDate: 'order.date'
       });
     comments = comments.map((co) => {
+      let nameSlot = {};
       co.orderDetail = orders.reduce((init, item) => {
         if (item.id_order === co.id_order && item.id_product === co.id_product) {
-          init.push(item);
+          const { name, avatar, ...rest } = item;
+          init.push(rest);
+          nameSlot = {
+            name,
+            avatar
+          };
         }
         return init;
       }, []);
+      co = { ...co, ...nameSlot };
       return co;
     });
     return {
