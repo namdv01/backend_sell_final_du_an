@@ -161,18 +161,27 @@ const AdminService = {
         .join('order', 'order.id', 'orderDetail.id_order')
         .join('user', 'user.id', 'order.id_buyer')
         .select({
+          id_order: 'order.id',
           id: 'orderDetail.id',
           name: 'product.name',
           price: 'orderDetail.price',
           quantity: 'orderDetail.quantity',
           nameBuyer: 'user.fullname',
-          logo: 'user.logo'
+          avatar: 'user.avatar'
         });
-      listOrder.detail = detailOrder;
+      listOrder.detail = detailOrder.reduce((init, de) => {
+        if (de.id_order === listOrder.id) {
+          const { id_order, nameBuyer, avatar, ...rest } = de;
+          init.push(rest);
+          listOrder.nameBuyer = nameBuyer;
+          listOrder.avatar = avatar;
+        }
+        return init;
+      }, []);
       return {
         code: 0,
         message: MESSAGE.GET_LIST_ORDER_SUCCESS,
-        payload: detailOrder,
+        payload: listOrder,
       }
     }
     if (idBuyer) {
