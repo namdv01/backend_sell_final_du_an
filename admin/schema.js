@@ -30,6 +30,12 @@ const getListUserSchema = {
         errorMessage: {
           _: MESSAGE.ROLE_INVALID
         }
+      },
+      fullname: {
+        ...baseSchema.fullname,
+        errorMessage: {
+          _: MESSAGE.FULLNAME_INVALID
+        }
       }
     }
   },
@@ -61,6 +67,12 @@ const getListShopSchema = {
       ...baseSchema.id,
       errorMessage: {
         _: MESSAGE.ID_NOK
+      }
+    },
+    name: {
+      ...baseSchema.name,
+      errorMessage: {
+        _: MESSAGE.NAME_NOK,
       }
     }
   }

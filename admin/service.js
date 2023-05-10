@@ -8,7 +8,7 @@ const { v4 } = require('uuid');
 
 const AdminService = {
   async getListUser(query) {
-    let { id, role, pageSize, pageIndex } = query;
+    let { id, role, pageSize, pageIndex, fullname } = query;
     const ques = pg('user');
     let lstUser;
     if (id) {
@@ -25,6 +25,9 @@ const AdminService = {
     }
     if (role) {
       ques.where({ role });
+    }
+    if (fullname) {
+      ques.whereILike('fullname', `%${fullname}%`);
     }
     pageSize = +pageSize || PAGINATION.SIZE;
     pageIndex = +pageIndex || PAGINATION.INDEX;
@@ -44,7 +47,7 @@ const AdminService = {
   },
 
   async getListShop(query) {
-    let { id, idUser, pageIndex, pageSize } = query;
+    let { id, idUser, pageIndex, pageSize, name } = query;
     const ques = pg('shop');
     let lstShop;
     if (id) {
@@ -70,6 +73,9 @@ const AdminService = {
     }
     if (idUser) {
       ques.where({ id_user: idUser });
+    }
+    if (name) {
+      ques.whereILike('shop.name', `%${name}%`);
     }
     const totalShop = await ques.clone().count('*').first();
     pageSize = +pageSize || PAGINATION.SIZE;
