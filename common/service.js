@@ -265,15 +265,18 @@ const CommonService = {
     pageSize = +pageSize || 10;
     const products = await pg('product')
       .leftJoin('orderDetail as od', 'product.id', 'od.id_product')
+      .leftJoin('shop', 'shop.id', 'product.id_shop')
       .select({
         'name': 'product.name',
         'id': 'product.id',
         'price': 'product.price',
         'id_shop': 'product.id_shop',
         'quantity': 'product.quantity',
+        'logo': 'shop.logo',
+        'nameShop': 'shop.name',
         'quantityBeSold': pg.raw('sum(case when od.quantity is not null then od.quantity else 0 end)')
       })
-      .groupBy('product.name', 'product.id', 'product.price', 'product.id_shop')
+      .groupBy('product.name', 'product.id', 'product.price', 'product.id_shop', 'nameShop', 'logo')
       .limit(pageSize)
       .orderBy([
         { column: 'quantityBeSold', order: 'desc' },
