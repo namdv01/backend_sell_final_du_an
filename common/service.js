@@ -238,8 +238,17 @@ const CommonService = {
     const shop = await pg('shop').where('id', idShop)
       .select('logo', 'name', 'address').first();
     const product = await pg('product')
+      .leftJoin('orderDetail as od', 'product.id', 'od.id_product')  
       .where('id_shop', idShop)
-      .select('name', 'quantity', 'id');
+      .select({
+        'name': 'product.name',
+        'id': 'product.id',
+        'price': 'product.price',
+        'id_shop': 'product.id_shop',
+        'quantity': 'product.quantity',
+        'quantityBeSold': pg.raw('sum(case when od.quantity is not null then od.quantity else 0 end)')
+      })
+      .groupBy('product.name', 'product.id', 'product.price', 'product.id_shop')
     const fixListProduct = product.map((p) => p.id);
     const productImage = await pg('productImage').whereIn('id_product', fixListProduct).select('id', 'image', 'id_product');
     for (let i = 0; i < product.length; i++) {
