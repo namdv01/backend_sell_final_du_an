@@ -342,7 +342,7 @@ const AdminService = {
     }
     const updateUser = await ques.update(formUpdate).returning('*');
     if (avatar) {
-      const public_id = checkAdmin.split('/').splice(-1)[0].slice(0, -4);
+      const public_id = checkAdmin.avatar.split('/').splice(-1)[0].slice(0, -4);
       await cloudinary.uploader.destroy('sale_final/product/' + public_id);
     }
     const { password: newPassword, ...rest } = updateUser[0];
@@ -459,7 +459,7 @@ const AdminService = {
       })));
     }
     if (imagesRemove && imagesRemove.length > 0) {
-      await trx('productImage').del().whereIn('image', imagesRemove).andWhere('id_product', id_product);
+      await trx('productImage').del().whereIn('image', imagesRemove).andWhere('id_product', idProduct);
       const delImage = imagesRemove.map((i) => {
         const public_id = i.split('/').splice(-1)[0].slice(0, -4);
         return cloudinary.uploader.destroy('sale_final/product/' + public_id);
