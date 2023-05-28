@@ -9,6 +9,7 @@ const register = {
     required: ['email', 'password', 'fullname', 'gender', 'phone', 'avatar', 'role'],
     type: 'object',
     additionalProperties: false,
+type: 'object',
     // avatar not required salt in crypto
     properties: {
       email: {
@@ -77,6 +78,7 @@ const login = {
     required: ['email', 'password'],
     type: 'object',
     additionalProperties: false,
+type: 'object',
     properties: {
       email: {
         ...baseSchema.email,
@@ -111,6 +113,7 @@ const changeProfile = {
   body: {
     type: 'object',
     additionalProperties: false,
+type: 'object',
     // avatar not required salt in crypto
     properties: {
       fullname: {
@@ -150,6 +153,7 @@ const changePassword = {
     required: ['curPassword', 'newPassword'],
     type: 'object',
     additionalProperties: false,
+type: 'object',
     // avatar not required salt in crypto
     properties: {
       curPassword: {
@@ -184,6 +188,7 @@ const searchProduct = {
   response: baseSchema.response,
   query: {
     additionalProperties: false,
+type: 'object',
     type: 'object',
     properties: {
       pageIndex: {
@@ -260,6 +265,7 @@ const productHot = {
   response: baseSchema.response,
   query: {
     additionalProperties: false,
+type: 'object',
     type: 'object',
     properties: {
       pageIndex: {

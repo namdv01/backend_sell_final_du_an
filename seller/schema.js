@@ -18,6 +18,7 @@ const createProduct = {
       }
     },
     additionalProperties: false,
+type: 'object',
     type: 'object',
     properties: {
       name: {
@@ -58,6 +59,7 @@ const editProduct = {
   response: baseSchema.response,
   body: {
     additionalProperties: false,
+type: 'object',
     type: 'object',
     properties: {
       name: {
@@ -107,6 +109,7 @@ const delProduct = {
   response: baseSchema.response,
   params: {
     additionalProperties: false,
+type: 'object',
     properties: {
       id: {
         ...baseSchema.id
@@ -122,6 +125,7 @@ const getProduct = {
   response: baseSchema.response,
   params: {
     additionalProperties: false,
+type: 'object',
     properties: {
       id: {
         type: 'string',
@@ -137,6 +141,7 @@ const getListProduct = {
   response: baseSchema.response,
   params: {
     additionalProperties: false,
+type: 'object',
     type: 'object',
     properties: {
       idShop: {
@@ -149,6 +154,7 @@ const getListProduct = {
   },
   query: {
     additionalProperties: false,
+type: 'object',
     type: 'object',
     properties: {
       pageIndex: {
@@ -174,6 +180,7 @@ const editOrder = {
   response: baseSchema.response,
   params: {
     additionalProperties: false,
+type: 'object',
     properties: {
       id: {
         ...baseSchema.id,
@@ -182,6 +189,7 @@ const editOrder = {
   },
   body: {
     additionalProperties: false,
+type: 'object',
     properties: {
       status: {
         ...baseSchema.statusOrder,
@@ -206,6 +214,7 @@ const getOrder = {
   response: baseSchema.response,
   params: {
     additionalProperties: false,
+type: 'object',
     properties: {
       id: {
         ...baseSchema.id,
@@ -221,6 +230,7 @@ const getListOrder = {
   response: baseSchema.response,
   query: {
     additionalProperties: false,
+type: 'object',
     properties: {
       pageIndex: {
         ...baseSchema.page,
@@ -245,6 +255,7 @@ const createShop = {
   response: baseSchema.response,
   body: {
     additionalProperties: false,
+type: 'object',
     required: ['name', 'address', 'logo'],
     properties: {
       name: {
@@ -274,6 +285,7 @@ const editShop = {
   response: baseSchema.response,
   params: {
     additionalProperties: false,
+type: 'object',
     properties: {
       id: {
         ...baseSchema.id,
@@ -282,6 +294,7 @@ const editShop = {
   },
   body: {
     additionalProperties: false,
+type: 'object',
     properties: {
       name: {
         ...baseSchema.name,
@@ -303,6 +316,7 @@ const delShop = {
   response: baseSchema.response,
   params: {
     additionalProperties: false,
+type: 'object',
     properties: {
       id: {
         ...baseSchema.id,
@@ -317,7 +331,9 @@ const getListShop = {
   tags: ['Seller (Người bán)'],
   response: baseSchema.response,
   query: {
+    type: 'object',
     additionalProperties: false,
+type: 'object',
     properties: {
       pageIndex: {
         ...baseSchema.page,

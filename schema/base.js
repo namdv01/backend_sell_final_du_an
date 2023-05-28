@@ -2,6 +2,7 @@ const baseSchema = {
   response: {
     200: {
       additionalProperties: false,
+type: 'object',
       type: 'object',
       required: ['code', 'message'],
       properties: {

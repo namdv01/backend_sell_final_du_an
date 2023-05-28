@@ -9,6 +9,7 @@ const orderSchema = {
   response: baseSchema.response,
   body: {
     additionalProperties: false,
+type: 'object',
     type: 'object',
     properties: {
       detail: {
@@ -48,6 +49,7 @@ const editOrderSchema = {
   response: baseSchema.response,
   body: {
     additionalProperties: false,
+type: 'object',
     type: 'object',
     properties: {
       idOrder: {
@@ -80,6 +82,7 @@ const commentSchema = {
   response: baseSchema.response,
   body: {
     additionalProperties: false,
+type: 'object',
     type: 'object',
     properties: {
       idProduct: {
@@ -125,6 +128,7 @@ const getListCommentSchema = {
   response: baseSchema.response,
   query: {
     additionalProperties: false,
+type: 'object',
     type: 'object',
     properties: {
       pageIndex: {
@@ -150,6 +154,7 @@ const detailCommentSchema = {
   response: baseSchema.response,
   params: {
     additionalProperties: false,
+type: 'object',
     type: 'object',
     properties: {
       id: {
@@ -169,6 +174,7 @@ const getListOrderSchema = {
   response: baseSchema.response,
   query: {
     additionalProperties: false,
+type: 'object',
     type: 'object',
     properties: {
       pageIndex: {
@@ -194,6 +200,7 @@ const detailOrderSchema = {
   response: baseSchema.response,
   params: {
     additionalProperties: false,
+type: 'object',
     type: 'object',
     properties: {
       id: {
@@ -213,6 +220,7 @@ const editCartSchema = {
   response: baseSchema.response,
   body: {
     additionalProperties: false,
+type: 'object',
     type: 'object',
     properties: {
       detail: {

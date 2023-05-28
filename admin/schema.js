@@ -8,6 +8,7 @@ const getListUserSchema = {
   tags: ['Admin (Quản trị viên)'],
   query: {
     additionalProperties: false,
+type: 'object',
     type: 'object',
     properties: {
       pageIndex: {
@@ -197,6 +198,7 @@ const editUserSchema = {
   params: {
     type: 'object',
     additionalProperties: false,
+type: 'object',
     properties: {
       id: {
         ...baseSchema.id,
@@ -206,6 +208,7 @@ const editUserSchema = {
   body: {
     type: 'object',
     additionalProperties: false,
+type: 'object',
     properties: {
       fullname: {
         ...baseSchema.fullname,
@@ -249,6 +252,7 @@ const editShopSchema = {
   params: {
     type: 'object',
     additionalProperties: false,
+type: 'object',
     properties: {
       id: {
         ...baseSchema.id,
@@ -258,6 +262,7 @@ const editShopSchema = {
   body: {
     type: 'object',
     additionalProperties: false,
+type: 'object',
     properties: {
       name: {
         ...baseSchema.name
@@ -280,6 +285,7 @@ const editOrderSchema = {
   params: {
     type: 'object',
     additionalProperties: false,
+type: 'object',
     properties: {
       id: {
         ...baseSchema.id,
@@ -289,6 +295,7 @@ const editOrderSchema = {
   body: {
     type: 'object',
     additionalProperties: false,
+type: 'object',
     properties: {
       status: {
         ...baseSchema.statusOrder,
@@ -314,6 +321,7 @@ const editProductSchema = {
   params: {
     type: 'object',
     additionalProperties: false,
+type: 'object',
     properties: {
       id: {
         ...baseSchema.id,
@@ -323,6 +331,7 @@ const editProductSchema = {
   body: {
     type: 'object',
     additionalProperties: false,
+type: 'object',
     properties: {
       name: {
         ...baseSchema.name,
@@ -368,6 +377,7 @@ const createShopSchema = {
   response: baseSchema.response,
   body: {
     additionalProperties: false,
+type: 'object',
     required: ['name', 'address', 'logo', 'idUser'],
     properties: {
       name: {
@@ -411,6 +421,7 @@ const createProductSchema = {
       }
     },
     additionalProperties: false,
+type: 'object',
     type: 'object',
     properties: {
       name: {
@@ -451,6 +462,7 @@ const delShopSchema = {
   response: baseSchema.response,
   params: {
     additionalProperties: false,
+type: 'object',
     properties: {
       id: {
         ...baseSchema.id
@@ -466,6 +478,7 @@ const delProductSchema = {
   response: baseSchema.response,
   params: {
     additionalProperties: false,
+type: 'object',
     properties: {
       id: {
         ...baseSchema.id,
