@@ -3,6 +3,9 @@ const MESSAGE = require("../constant/message");
 const { ROLE } = require("../constant");
 
 const getListUserSchema = {
+  summary: 'Quản trị viên lấy danh sách người dùng',
+  description: 'Quản trị viên lấy danh sách người dùng',
+  tags: ['Admin (Quản trị viên)'],
   query: {
     additionalProperties: false,
     type: 'object',
@@ -43,6 +46,9 @@ const getListUserSchema = {
 }
 
 const getListShopSchema = {
+  summary: 'Quản trị viên lấy danh sách gian hàng',
+  description: 'Quản trị viên lấy danh sách gian hàng',
+  tags: ['Admin (Quản trị viên)'],
   response: baseSchema.response,
   query: {
     pageIndex: {
@@ -79,6 +85,9 @@ const getListShopSchema = {
 }
 
 const getListProductSchema = {
+  summary: 'Quản trị viên lấy danh sách sản phẩm',
+  description: 'Quản trị viên lấy danh sách sản phẩm',
+  tags: ['Admin (Quản trị viên)'],
   response: baseSchema.response,
   query: {
     pageIndex: {
@@ -109,6 +118,9 @@ const getListProductSchema = {
 }
 
 const getListOrderSchema = {
+  summary: 'Quản trị viên lấy danh sách đơn hàng',
+  description: 'Quản trị viên lấy danh sách đơn hàng',
+  tags: ['Admin (Quản trị viên)'],
   response: baseSchema.response,
   query: {
     id: {
@@ -145,6 +157,9 @@ const getListOrderSchema = {
 }
 
 const getListCommentSchema = {
+  summary: 'Quản trị viên lấy danh sách đánh giá đơn hàng',
+  description: 'Quản trị viên lấy danh sách đánh giá đơn hàng',
+  tags: ['Admin (Quản trị viên)'],
   response: baseSchema.response,
   query: {
     idProduct: {
@@ -175,6 +190,9 @@ const getListCommentSchema = {
 }
 
 const editUserSchema = {
+  summary: 'Quản trị viên sửa thông tin người dùng',
+  description: 'Quản trị viên sửa thông tin người dùng',
+  tags: ['Admin (Quản trị viên)'],
   response: baseSchema.response,
   params: {
     type: 'object',
@@ -224,6 +242,9 @@ const editUserSchema = {
 }
 
 const editShopSchema = {
+  summary: 'Quản trị viên sửa thông tin sản phẩm',
+  description: 'Quản trị viên sửa thông tin sản phẩm',
+  tags: ['Admin (Quản trị viên)'],
   response: baseSchema.response,
   params: {
     type: 'object',
@@ -252,6 +273,9 @@ const editShopSchema = {
 }
 
 const editOrderSchema = {
+  summary: 'Quản trị viên sửa thông tin đơn hàng',
+  description: 'Quản trị viên sửa thông tin đơn hàng',
+  tags: ['Admin (Quản trị viên)'],
   response: baseSchema.response,
   params: {
     type: 'object',
@@ -283,6 +307,9 @@ const editOrderSchema = {
 }
 
 const editProductSchema = {
+  summary: 'Quản trị viên sửa thông tin sản phẩm',
+  description: 'Quản trị viên sửa thông tin sản phẩm',
+  tags: ['Admin (Quản trị viên)'],
   response: baseSchema.response,
   params: {
     type: 'object',
@@ -335,6 +362,9 @@ const editProductSchema = {
 }
 
 const createShopSchema = {
+  summary: 'Quản trị viên tạo gian hàng',
+  description: 'Quản trị viên tạo gian hàng',
+  tags: ['Admin (Quản trị viên)'],
   response: baseSchema.response,
   body: {
     additionalProperties: false,
@@ -365,6 +395,9 @@ const createShopSchema = {
 }
 
 const createProductSchema = {
+  summary: 'Quản trị viên tạo sản phẩm',
+  description: 'Quản trị viên tạo sản phẩm',
+  tags: ['Admin (Quản trị viên)'],
   response: baseSchema.response,
   body: {
     required: ['name', 'quantity', 'price', 'idShop', 'images'],
@@ -412,6 +445,9 @@ const createProductSchema = {
 }
 
 const delShopSchema = {
+  summary: 'Quản trị viên xóa gian hàng',
+  description: 'Quản trị viên xóa gian hàng',
+  tags: ['Admin (Quản trị viên)'],
   response: baseSchema.response,
   params: {
     additionalProperties: false,
@@ -424,6 +460,9 @@ const delShopSchema = {
 }
 
 const delProductSchema = {
+  summary: 'Quản trị viên xóa sản phẩm',
+  description: 'Quản trị viên xóa sản phẩm',
+  tags: ['Admin (Quản trị viên)'],
   response: baseSchema.response,
   params: {
     additionalProperties: false,

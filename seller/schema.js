@@ -2,6 +2,9 @@ const baseSchema = require("../schema/base");
 const MESSAGE = require("../constant/message");
 
 const createProduct = {
+  summary: 'Người bán tạo sản phẩm',
+  description: 'Người bán tạo sản phẩm',
+  tags: ['Seller (Người bán)'],
   response: baseSchema.response,
   body: {
     required: ['name', 'quantity', 'price', 'idShop', 'images'],
@@ -49,6 +52,9 @@ const createProduct = {
 };
 
 const editProduct = {
+  summary: 'Người bán sửa sản phẩm',
+  description: 'Người bán sửa sản phẩm',
+  tags: ['Seller (Người bán)'],
   response: baseSchema.response,
   body: {
     additionalProperties: false,
@@ -95,6 +101,9 @@ const editProduct = {
 };
 
 const delProduct = {
+  summary: 'Người bán xóa sản phẩm',
+  description: 'Người bán xóa sản phẩm',
+  tags: ['Seller (Người bán)'],
   response: baseSchema.response,
   params: {
     additionalProperties: false,
@@ -107,6 +116,9 @@ const delProduct = {
 };
 
 const getProduct = {
+  summary: 'Người bán lấy thông tin sản phẩm',
+  description: 'Người bán lấy thông tin sản phẩm',
+  tags: ['Seller (Người bán)'],
   response: baseSchema.response,
   params: {
     additionalProperties: false,
@@ -119,6 +131,9 @@ const getProduct = {
 };
 
 const getListProduct = {
+  summary: 'Người bán lấy danh sách sản phẩm',
+  description: 'Người bán lấy danh sách sản phẩm',
+  tags: ['Seller (Người bán)'],
   response: baseSchema.response,
   params: {
     additionalProperties: false,
@@ -153,6 +168,9 @@ const getListProduct = {
 };
 
 const editOrder = {
+  summary: 'Người bán cập nhật thông tin đơn hàng',
+  description: 'Người bán cập nhật thông tin đơn hàng',
+  tags: ['Seller (Người bán)'],
   response: baseSchema.response,
   params: {
     additionalProperties: false,
@@ -182,6 +200,9 @@ const editOrder = {
 };
 
 const getOrder = {
+  summary: 'Người bán lấy thông tin đơn hàng',
+  description: 'Người bán lấy thông tin đơn hàng',
+  tags: ['Seller (Người bán)'],
   response: baseSchema.response,
   params: {
     additionalProperties: false,
@@ -194,6 +215,9 @@ const getOrder = {
 };
 
 const getListOrder = {
+  summary: 'Người bán lấy danh sách đơn hàng',
+  description: 'Người bán lấy danh sách đơn hàng',
+  tags: ['Seller (Người bán)'],
   response: baseSchema.response,
   query: {
     additionalProperties: false,
@@ -215,6 +239,9 @@ const getListOrder = {
 };
 
 const createShop = {
+  summary: 'Người bán tạo gian hàng',
+  description: 'Người bán tạo gian hàng',
+  tags: ['Seller (Người bán)'],
   response: baseSchema.response,
   body: {
     additionalProperties: false,
@@ -241,6 +268,9 @@ const createShop = {
 };
 
 const editShop = {
+  summary: 'Người bán sửa thông tin gian hàng',
+  description: 'Người bán sửa thông tin gian hàng',
+  tags: ['Seller (Người bán)'],
   response: baseSchema.response,
   params: {
     additionalProperties: false,
@@ -267,6 +297,9 @@ const editShop = {
 };
 
 const delShop = {
+  summary: 'Người bán xóa gian hàng',
+  description: 'Người bán xóa gian hàng',
+  tags: ['Seller (Người bán)'],
   response: baseSchema.response,
   params: {
     additionalProperties: false,
@@ -279,6 +312,9 @@ const delShop = {
 };
 
 const getListShop = {
+  summary: 'Người bán lấy danh sách gian hàng quản lý',
+  description: 'Người bán lấy danh sách gian hàng quản lý',
+  tags: ['Seller (Người bán)'],
   response: baseSchema.response,
   query: {
     additionalProperties: false,

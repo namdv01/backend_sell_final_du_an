@@ -23,6 +23,8 @@
 		"@fastify/jwt": "^6.5.0",
 		"@fastify/sensible": "^5.0.0",
 		"@fastify/static": "^6.9.0",
+		"@fastify/swagger": "^8.5.1",
+		"@fastify/swagger-ui": "^1.8.1",
 		"ajv": "^8.12.0",
 		"ajv-errors": "^3.0.0",
 		"ajv-formats": "^2.1.1",

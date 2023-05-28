@@ -47,11 +47,11 @@ module.exports = async function (fastify, opts) {
   // })
 
   fastify.decorate('auth', async (req, rep) => {
-    const token = req.headers.authorization.split(' ')[1];
-    if (!token) {
-      throw new Error(MESSAGE.IS_NOT_AUTH);
-    }
-    await req.jwtVerify(token);
+    // const token = req.headers.authorization;
+    // if (!token) {
+    //   throw new Error('nạmql');
+    // }
+    await req.jwtVerify();
     const { user } = req;
     if (!user) {
       throw new Error(MESSAGE.IS_NOT_AUTH);

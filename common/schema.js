@@ -2,6 +2,9 @@ const baseSchema = require("../schema/base");
 const MESSAGE = require("../constant/message");
 
 const register = {
+  summary: 'Đăng ký người dùng mới',
+  description: 'Đăng ký người dùng mới',
+  tags: ['Common (Tác vụ chung người dùng)'],
   body: {
     required: ['email', 'password', 'fullname', 'gender', 'phone', 'avatar', 'role'],
     type: 'object',
@@ -66,6 +69,9 @@ const register = {
 };
 
 const login = {
+  summary: 'Đăng nhập',
+  description: 'Đăng nhập',
+  tags: ['Common (Tác vụ chung người dùng)'],
   response: baseSchema.response,
   body: {
     required: ['email', 'password'],
@@ -99,6 +105,9 @@ const checkLogin = {
 };
 
 const changeProfile = {
+  summary: 'Thay đổi thông tin cá nhân',
+  description: 'Thay đổi thông tin cá nhân',
+  tags: ['Common (Tác vụ chung người dùng)'],
   body: {
     type: 'object',
     additionalProperties: false,
@@ -134,6 +143,9 @@ const changeProfile = {
 }
 
 const changePassword = {
+  summary: 'Thay đổi mật khẩu',
+  description: 'Thay đổi mật khẩu',
+  tags: ['Common (Tác vụ chung người dùng)'],
   body: {
     required: ['curPassword', 'newPassword'],
     type: 'object',
@@ -166,6 +178,9 @@ const changePassword = {
 }
 
 const searchProduct = {
+  summary: 'Tìm kiếm danh sách sản phẩm',
+  description: 'Tìm kiếm danh sách sản phẩm',
+  tags: ['Common (Tác vụ chung người dùng)'],
   response: baseSchema.response,
   query: {
     additionalProperties: false,
@@ -203,6 +218,9 @@ const searchProduct = {
 }
 
 const detailProduct = {
+  summary: 'Xem chi tiết sản phẩm',
+  description: 'Xem chi tiết sách sản phẩm',
+  tags: ['Common (Tác vụ chung người dùng)'],
   response: baseSchema.response,
   params: {
     type: 'object',
@@ -218,6 +236,9 @@ const detailProduct = {
 }
 
 const productInShop = {
+  summary: 'Danh sách sản phẩm trong 1 gian hàng',
+  description: 'Danh sách sản phẩm trong 1 gian hàng',
+  tags: ['Common (Tác vụ chung người dùng)'],
   response: baseSchema.response,
   params: {
     type: 'object',
@@ -233,6 +254,9 @@ const productInShop = {
 }
 
 const productHot = {
+  summary: 'Danh sách sản phẩm bán chạy',
+  description: 'Danh sách sản phẩm bán chạy',
+  tags: ['Common (Tác vụ chung người dùng)'],
   response: baseSchema.response,
   query: {
     additionalProperties: false,

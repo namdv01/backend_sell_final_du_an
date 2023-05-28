@@ -3,6 +3,9 @@ const MESSAGE = require("../constant/message");
 const { ROLE } = require("../constant");
 
 const orderSchema = {
+  summary: 'Người mua đặt đơn hàng',
+  description: 'Người mua đặt đơn hàng',
+  tags: ['Buyer (Người mua)'],
   response: baseSchema.response,
   body: {
     additionalProperties: false,
@@ -39,6 +42,9 @@ const orderSchema = {
 }
 
 const editOrderSchema = {
+  summary: 'Người mua cập nhật đơn hàng',
+  description: 'Người mua cập nhật đơn hàng',
+  tags: ['Buyer (Người mua)'],
   response: baseSchema.response,
   body: {
     additionalProperties: false,
@@ -68,6 +74,9 @@ const editOrderSchema = {
 }
 
 const commentSchema = {
+  summary: 'Người mua bình luận sản phẩm đã mua',
+  description: 'Người mua bình luận sản phẩm đã mua',
+  tags: ['Buyer (Người mua)'],
   response: baseSchema.response,
   body: {
     additionalProperties: false,
@@ -110,6 +119,9 @@ const commentSchema = {
 }
 
 const getListCommentSchema = {
+  summary: 'Người mua lấy danh sách bình luận',
+  description: 'Người mua lấy danh sách bình luận',
+  tags: ['Buyer (Người mua)'],
   response: baseSchema.response,
   query: {
     additionalProperties: false,
@@ -132,6 +144,9 @@ const getListCommentSchema = {
 }
 
 const detailCommentSchema = {
+  summary: 'Người mua xem chi tiết bình luận',
+  description: 'Người mua xem chi tiết bình luận',
+  tags: ['Buyer (Người mua)'],
   response: baseSchema.response,
   params: {
     additionalProperties: false,
@@ -148,6 +163,9 @@ const detailCommentSchema = {
 }
 
 const getListOrderSchema = {
+  summary: 'Người mua xem danh sách đơn hàng',
+  description: 'Người mua xem danh sách đơn hàng',
+  tags: ['Buyer (Người mua)'],
   response: baseSchema.response,
   query: {
     additionalProperties: false,
@@ -170,6 +188,9 @@ const getListOrderSchema = {
 }
 
 const detailOrderSchema = {
+  summary: 'Người mua xem chi tiết đơn hàng',
+  description: 'Người mua xem chi tiết đơn hàng',
+  tags: ['Buyer (Người mua)'],
   response: baseSchema.response,
   params: {
     additionalProperties: false,
@@ -186,6 +207,9 @@ const detailOrderSchema = {
 }
 
 const editCartSchema = {
+  summary: 'Người mua chỉnh sửa giỏ hàng',
+  description: 'Người mua chỉnh sửa giỏ hàng',
+  tags: ['Buyer (Người mua)'],
   response: baseSchema.response,
   body: {
     additionalProperties: false,
@@ -216,6 +240,9 @@ const editCartSchema = {
 }
 
 const getCartSchema = {
+  summary: 'Người mua lấy thông tin giỏ hàng',
+  description: 'Người mua lấy thông tin giỏ hàng',
+  tags: ['Buyer (Người mua)'],
   response: baseSchema.response,
 }
 
